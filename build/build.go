@@ -50,7 +50,8 @@ func (b *Builder) build_page(postpath string) (string, Document_Meta, bool) {
 	head := BuildHeader(b.Skin, headd)
 	document.Head = head
 
-	footd := Footer{IsNotIndex: true}
+	vinfo := "Skin with - " + b.Skin.Info.Name + " / Made by - " + b.Skin.Info.Author + " / " + b.Skin.Info.Summary
+	footd := Footer{IsNotIndex: true, VInfo: vinfo}
 	foot := BuildFooter(b.Skin, footd)
 	document.Foot = foot
 
@@ -86,7 +87,8 @@ func (b *Builder) build_index() string {
 	head := BuildHeader(b.Skin, headd)
 	indexs.Head = head
 
-	footd := Footer{IsNotIndex: false}
+	vinfo := "Skin with - " + b.Skin.Info.Name + " / Made by - " + b.Skin.Info.Author + " / " + b.Skin.Info.Summary
+	footd := Footer{IsNotIndex: false, VInfo: vinfo}
 	foot := BuildFooter(b.Skin, footd)
 	indexs.Foot = foot
 
@@ -111,6 +113,57 @@ func (b *Builder) build_index() string {
 	t.Execute(&writer, indexs)
 
 	return writer.String()
+}
+
+func (b *Builder) build_about_page() string {
+	wd, _ := os.Getwd()
+	markup := nemomark.MakeNemomark()
+
+	ctx, perr := os.ReadFile(wd + "/post/about.ps")
+
+	if perr != nil {
+		panic(perr)
+	}
+
+	post_rawctx := string(ctx)
+
+	document := NewDocument()
+
+	document.Content = markup.Mark(post_rawctx)
+
+	document.Content = strings.ReplaceAll(document.Content, "\n", "\n<br />")
+
+	headd := Header{IsNotIndex: false}
+	head := BuildHeader(b.Skin, headd)
+	document.Head = head
+
+	vinfo := "Skin with - " + b.Skin.Info.Name + " / Made by - " + b.Skin.Info.Author + " / " + b.Skin.Info.Summary
+	footd := Footer{IsNotIndex: false, VInfo: vinfo}
+	foot := BuildFooter(b.Skin, footd)
+	document.Foot = foot
+
+	navd := Nav{IsNotIndex: false}
+	nav := BuildNav(b.Skin, navd)
+	document.Nav = nav
+
+	file, fserr := os.ReadFile(b.Skin.Info.Paths.About)
+
+	if fserr != nil {
+		panic(fserr)
+	}
+
+	var builder template.Template
+	t, err := builder.Parse(string(file))
+
+	if err != nil {
+		panic(err)
+	}
+
+	var writer bytes.Buffer
+	t.Execute(&writer, document)
+
+	return writer.String()
+
 }
 
 func (b *Builder) pack_res() {
@@ -190,7 +243,7 @@ func (b *Builder) Build() {
 
 	for _, ctx := range dir {
 		name := ctx.Name()
-		if strings.ContainsAny(name, ".ps") && (name != "index.ps") && (!ctx.Type().IsDir()) {
+		if strings.ContainsAny(name, ".ps") && (name != "about.ps") && (!ctx.Type().IsDir()) {
 			BuildTargets = append(BuildTargets, (workd + name))
 		}
 	}
@@ -230,6 +283,13 @@ func (b *Builder) Build() {
 	indexpath := wd + "/dist/index.html"
 
 	os.WriteFile(indexpath, []byte(indext), 0777)
+
+	_, ex := os.Stat(wd + "/post/about.ps")
+	if !os.IsNotExist(ex) {
+		about_ctx := b.build_about_page()
+		about_path := wd + "/dist/about.html"
+		os.WriteFile(about_path, []byte(about_ctx), 0777)
+	}
 
 	b.pack_res()
 }

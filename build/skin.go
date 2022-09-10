@@ -9,6 +9,7 @@ import (
 type SkinPath struct {
 	Index  string `json:"index"`
 	Post   string `json:"post"`
+	About  string `json:"about"`
 	Header string `json:"header"`
 	Footer string `json:"footer"`
 	Nav    string `json:"nav"`
@@ -18,6 +19,7 @@ type SkinInfo struct {
 	Name    string   `json:"name"`
 	Author  string   `json:"author"`
 	Version string   `json:"version"`
+	Summary string   `json:"summary"`
 	Paths   SkinPath `json:"paths"`
 }
 

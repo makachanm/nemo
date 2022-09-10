@@ -40,6 +40,7 @@ type Header struct {
 type Footer struct {
 	IsNotIndex bool
 	Footer     string
+	VInfo      string
 }
 
 type Nav struct {
