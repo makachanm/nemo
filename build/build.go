@@ -46,7 +46,6 @@ func (b *Builder) build_page(postpath string) (string, Document_Meta, bool) {
 
 	document.ParseMeta(post_ctx[0])
 
-	//TODO: MOVE TO BUILD METHOD
 	headd := Header{IsNotIndex: true}
 	head := BuildHeader(b.Skin, headd)
 	document.Head = head
@@ -115,8 +114,6 @@ func (b *Builder) build_index() string {
 }
 
 func (b *Builder) pack_res() {
-	//var skin_statics []string = make([]string, 0)
-	//var post_statics []string = make([]string, 0)
 
 	wd, werr := os.Getwd()
 	if werr != nil {
@@ -152,20 +149,6 @@ func (b *Builder) pack_res() {
 		panic(cerr)
 	}
 
-	/*
-		sdir, rderr := os.ReadDir(wd + "/skin/static/")
-		if rderr != nil {
-			panic(rderr)
-		}
-
-		for _, ctx := range sdir {
-			fmt.Println(ctx)
-			path := wd + "/skin/static/" + ctx.Name()
-			skin_statics = append(skin_statics, path)
-		}
-
-		fmt.Println(skin_statics)
-	*/
 }
 
 func make_file_name(title string, smp TimeStamp) string {
