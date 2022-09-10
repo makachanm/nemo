@@ -1,0 +1,9 @@
+config.json
+nemo
+*_test.go
+*_test.sh
+todo
+
+/dist
+/skin
+/post
