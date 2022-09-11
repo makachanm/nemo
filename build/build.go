@@ -202,6 +202,14 @@ func (b *Builder) pack_res() {
 		panic(cerr)
 	}
 
+	ressrc := wd + "/post/res"
+	resdet := wd + "/dist/res"
+
+	rerr := DirCopy(ressrc, resdet)
+	if rerr != nil {
+		panic(rerr)
+	}
+
 }
 
 func make_file_name(title string, smp TimeStamp) string {
