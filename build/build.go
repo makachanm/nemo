@@ -48,7 +48,9 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 
 	document.ParseMeta(postCtx[0])
 
-	headd := Header{IsNotIndex: true}
+	bname := b.Manifest.Name
+
+	headd := Header{IsNotIndex: true, BlogName: bname, PostName: document.Meta.Title}
 	head := BuildHeader(b.Skin, headd)
 	document.Head = head
 
@@ -57,7 +59,7 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	foot := BuildFooter(b.Skin, footd)
 	document.Foot = foot
 
-	navd := Nav{IsNotIndex: true}
+	navd := Nav{IsNotIndex: true, BlogName: bname}
 	nav := BuildNav(b.Skin, navd)
 	document.Nav = nav
 
@@ -85,7 +87,9 @@ func (b *Builder) buildIndex() string {
 	indexs := NewIndexData()
 	indexs.Indexs = b.PostList
 
-	headd := Header{IsNotIndex: false}
+	bname := b.Manifest.Name
+
+	headd := Header{IsNotIndex: false, BlogName: bname}
 	head := BuildHeader(b.Skin, headd)
 	indexs.Head = head
 
@@ -94,7 +98,7 @@ func (b *Builder) buildIndex() string {
 	foot := BuildFooter(b.Skin, footd)
 	indexs.Foot = foot
 
-	navd := Nav{IsNotIndex: false}
+	navd := Nav{IsNotIndex: false, BlogName: bname}
 	nav := BuildNav(b.Skin, navd)
 	indexs.Nav = nav
 
@@ -135,7 +139,9 @@ func (b *Builder) buildAboutPage() string {
 
 	document.Content = strings.ReplaceAll(document.Content, "\n", "\n<br />")
 
-	headd := Header{IsNotIndex: false}
+	bname := b.Manifest.Name
+
+	headd := Header{IsNotIndex: false, BlogName: bname}
 	head := BuildHeader(b.Skin, headd)
 	document.Head = head
 
@@ -144,7 +150,7 @@ func (b *Builder) buildAboutPage() string {
 	foot := BuildFooter(b.Skin, footd)
 	document.Foot = foot
 
-	navd := Nav{IsNotIndex: false}
+	navd := Nav{IsNotIndex: false, BlogName: bname}
 	nav := BuildNav(b.Skin, navd)
 	document.Nav = nav
 

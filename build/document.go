@@ -35,6 +35,8 @@ type Document struct {
 type Header struct {
 	IsNotIndex bool
 	Header     string
+	BlogName   string
+	PostName   string
 }
 
 type Footer struct {
@@ -46,6 +48,7 @@ type Footer struct {
 type Nav struct {
 	IsNotIndex bool
 	Navbar     string
+	BlogName   string
 }
 
 type IndexPage struct {
