@@ -26,10 +26,7 @@ func DirCopy(srcP string, desP string) error {
 			return oerr
 		}
 		defer func(op *os.File) {
-			err := op.Close()
-			if err != nil {
-
-			}
+			_ = op.Close()
 		}(op)
 
 		dp, derr := os.Create(opath)
@@ -37,10 +34,7 @@ func DirCopy(srcP string, desP string) error {
 			return derr
 		}
 		defer func(dp *os.File) {
-			err := dp.Close()
-			if err != nil {
-
-			}
+			_ = dp.Close()
 		}(dp)
 
 		_ = dp.Chmod(info.Mode())
