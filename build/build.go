@@ -15,12 +15,14 @@ import (
 const Spliter = "==========\n"
 
 type Builder struct {
+	Manifest Manifest
 	Skin     Skin
 	PostList []DocumentMeta
 }
 
 func MakeNewBuilder() Builder {
-	return Builder{Skin: MakeSkin()}
+	mfest := GetManifest()
+	return Builder{Skin: MakeSkin(), Manifest: mfest}
 }
 
 func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {

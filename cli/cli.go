@@ -21,6 +21,9 @@ func (ci *Interface) Handle(args []string) {
 	switch args[1] {
 	case "build":
 		buildHandler()
+
+	default:
+		fmt.Println("unknown command")
 	}
 }
 

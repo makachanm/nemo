@@ -1,4 +1,4 @@
-package main
+package build
 
 import (
 	"encoding/json"
@@ -22,7 +22,7 @@ func GetManifest() Manifest {
 
 	_, maniexist := os.Stat(wd + "/manifest.json")
 	if os.IsNotExist(maniexist) {
-		fmt.Println("Manifest is not exist.")
+		fmt.Println("Manifest is not exist")
 		os.Exit(1)
 	}
 

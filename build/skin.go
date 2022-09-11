@@ -41,7 +41,7 @@ func (s *Skin) GetSkin() {
 
 	_, skinexist := os.Stat(skinpath + "/skin")
 	if os.IsNotExist(skinexist) {
-		fmt.Println("Skin is not exist.")
+		fmt.Println("Skin is not exist")
 		os.Exit(1)
 	}
 
