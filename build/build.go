@@ -127,7 +127,7 @@ func (b *Builder) buildAboutPage() string {
 
 	postRawctx := string(ctx)
 
-	document := NewDocument()
+	document := NewAboutPage()
 
 	document.Content = markup.Mark(postRawctx)
 
@@ -145,6 +145,8 @@ func (b *Builder) buildAboutPage() string {
 	navd := Nav{IsNotIndex: false}
 	nav := BuildNav(b.Skin, navd)
 	document.Nav = nav
+
+	document.BuildInfo = "" //WIP
 
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.About)
 

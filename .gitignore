@@ -1,4 +1,4 @@
-config.json
+manifest.json
 nemo
 *_test.go
 *_test.sh

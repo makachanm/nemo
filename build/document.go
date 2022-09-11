@@ -55,6 +55,15 @@ type IndexPage struct {
 	Nav    Nav
 }
 
+type AboutPage struct {
+	Meta      DocumentMeta
+	Head      Header
+	Foot      Footer
+	Nav       Nav
+	Content   string
+	BuildInfo string
+}
+
 func MakeMetaData() DocumentMeta {
 	return DocumentMeta{}
 }
@@ -65,6 +74,10 @@ func NewDocument() Document {
 
 func NewIndexData() IndexPage {
 	return IndexPage{}
+}
+
+func NewAboutPage() AboutPage {
+	return AboutPage{}
 }
 
 func MakeTimeStamp(year int, month int, day int, hour int, min int) TimeStamp {

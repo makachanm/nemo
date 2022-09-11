@@ -2,6 +2,7 @@ package build
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"reflect"
 )
@@ -36,6 +37,12 @@ func (s *Skin) GetSkin() {
 
 	if perr != nil {
 		panic(perr)
+	}
+
+	_, skinexist := os.Stat(skinpath + "/skin")
+	if os.IsNotExist(skinexist) {
+		fmt.Println("Skin is not exist.")
+		os.Exit(1)
 	}
 
 	ctx, ferr := os.ReadFile(skinpath + "/skin/skin.json")
