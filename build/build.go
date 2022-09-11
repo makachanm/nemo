@@ -41,7 +41,7 @@ func (b *Builder) build_page(postpath string) (string, Document_Meta, bool) {
 
 	document := NewDocument()
 
-	document.Content = markup.Mark(post_ctx[1])
+	document.Content = markup.Mark(strings.Join(post_ctx[1:], ""))
 	document.Content = strings.ReplaceAll(document.Content, "\n", "\n<br />")
 
 	document.ParseMeta(post_ctx[0])
