@@ -4,19 +4,19 @@ import (
 	"strings"
 )
 
-type renderer struct {
+type Renderer struct {
 }
 
-func NewRenderer() renderer {
-	return renderer{}
+func NewRenderer() Renderer {
+	return Renderer{}
 }
 
-func (rd *renderer) item_render(input ExprNode) string {
+func (rd *Renderer) itemRender(input ExprNode) string {
 	var builded string
-	var handler = Markdown_Handlers
+	var handler = MarkdownHandlers
 	var stringbuilder strings.Builder
 
-	if input.Node_type == TYPE_STRING {
+	if input.NodeType == TypeString {
 		ctx := RenderPlain(input.Context)
 		stringbuilder.WriteString(builded)
 		stringbuilder.WriteString(ctx)
@@ -24,24 +24,24 @@ func (rd *renderer) item_render(input ExprNode) string {
 		builded = stringbuilder.String()
 		stringbuilder.Reset()
 	} else {
-		handle, is_func_exist := handler[input.Func_context.Fucntion_name]
-		if is_func_exist {
-			render_target := input.Func_context
+		handle, isFuncExist := handler[input.FuncContext.FucntionName]
+		if isFuncExist {
+			renderTarget := input.FuncContext
 			childstr := ""
-			if input.Has_child {
+			if input.HasChild {
 				var childstrbuilder strings.Builder
-				for _, child_node := range input.Child {
-					childctx := rd.item_render(child_node)
+				for _, childNode := range input.Child {
+					childctx := rd.itemRender(childNode)
 					childstrbuilder.WriteString(childstr)
 					childstrbuilder.WriteString(childctx)
 
 					childstr = childstrbuilder.String()
 					childstrbuilder.Reset()
 				}
-				render_target.Context = []string{childstr}
+				renderTarget.Context = []string{childstr}
 			}
 
-			ctx := handle(render_target)
+			ctx := handle(renderTarget)
 			stringbuilder.WriteString(builded)
 			stringbuilder.WriteString(ctx)
 
@@ -53,20 +53,20 @@ func (rd *renderer) item_render(input ExprNode) string {
 	return builded
 }
 
-func (rd *renderer) render(input ExprNode) string {
+func (rd *Renderer) render(input ExprNode) string {
 	var builded string
 	//var handler = Markdown_Handlers
 	var stringbuilder strings.Builder
 
-	origin_node := input
-	if !(origin_node.Node_type == TYPE_SECTION) {
+	originNode := input
+	if !(originNode.NodeType == TypeSection) {
 		return ""
 	}
 
-	origin_child_node := origin_node.Child
+	originChildNode := originNode.Child
 
-	for _, node := range origin_child_node {
-		ctx := rd.item_render(node)
+	for _, node := range originChildNode {
+		ctx := rd.itemRender(node)
 		stringbuilder.WriteString(builded)
 		stringbuilder.WriteString(ctx)
 
@@ -74,6 +74,6 @@ func (rd *renderer) render(input ExprNode) string {
 		stringbuilder.Reset()
 	}
 
-	tagged_result := "<p>" + builded + "</p>"
-	return tagged_result
+	taggedResult := "<p>" + builded + "</p>"
+	return taggedResult
 }

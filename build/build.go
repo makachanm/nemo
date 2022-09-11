@@ -16,14 +16,14 @@ const Spliter = "==========\n"
 
 type Builder struct {
 	Skin     Skin
-	PostList []Document_Meta
+	PostList []DocumentMeta
 }
 
 func MakeNewBuilder() Builder {
 	return Builder{Skin: MakeSkin()}
 }
 
-func (b *Builder) build_page(postpath string) (string, Document_Meta, bool) {
+func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	markup := nemomark.MakeNemomark()
 
 	ctx, perr := os.ReadFile(postpath)
@@ -32,19 +32,19 @@ func (b *Builder) build_page(postpath string) (string, Document_Meta, bool) {
 		panic(perr)
 	}
 
-	post_rawctx := string(ctx)
+	postRawctx := string(ctx)
 
-	if !strings.ContainsAny(post_rawctx, Spliter) {
-		return "", Document_Meta{}, false
+	if !strings.ContainsAny(postRawctx, Spliter) {
+		return "", DocumentMeta{}, false
 	}
-	post_ctx := strings.Split(post_rawctx, Spliter)
+	postCtx := strings.Split(postRawctx, Spliter)
 
 	document := NewDocument()
 
-	document.Content = markup.Mark(strings.Join(post_ctx[1:], ""))
+	document.Content = markup.Mark(strings.Join(postCtx[1:], ""))
 	document.Content = strings.ReplaceAll(document.Content, "\n", "\n<br />")
 
-	document.ParseMeta(post_ctx[0])
+	document.ParseMeta(postCtx[0])
 
 	headd := Header{IsNotIndex: true}
 	head := BuildHeader(b.Skin, headd)
@@ -73,13 +73,13 @@ func (b *Builder) build_page(postpath string) (string, Document_Meta, bool) {
 	}
 
 	var writer bytes.Buffer
-	t.Execute(&writer, document)
+	_ = t.Execute(&writer, document)
 
 	return writer.String(), document.Meta, true
 
 }
 
-func (b *Builder) build_index() string {
+func (b *Builder) buildIndex() string {
 	indexs := NewIndexData()
 	indexs.Indexs = b.PostList
 
@@ -110,12 +110,12 @@ func (b *Builder) build_index() string {
 	}
 
 	var writer bytes.Buffer
-	t.Execute(&writer, indexs)
+	_ = t.Execute(&writer, indexs)
 
 	return writer.String()
 }
 
-func (b *Builder) build_about_page() string {
+func (b *Builder) buildAboutPage() string {
 	wd, _ := os.Getwd()
 	markup := nemomark.MakeNemomark()
 
@@ -125,11 +125,11 @@ func (b *Builder) build_about_page() string {
 		panic(perr)
 	}
 
-	post_rawctx := string(ctx)
+	postRawctx := string(ctx)
 
 	document := NewDocument()
 
-	document.Content = markup.Mark(post_rawctx)
+	document.Content = markup.Mark(postRawctx)
 
 	document.Content = strings.ReplaceAll(document.Content, "\n", "\n<br />")
 
@@ -160,13 +160,13 @@ func (b *Builder) build_about_page() string {
 	}
 
 	var writer bytes.Buffer
-	t.Execute(&writer, document)
+	_ = t.Execute(&writer, document)
 
 	return writer.String()
 
 }
 
-func (b *Builder) pack_res() {
+func (b *Builder) packRes() {
 
 	wd, werr := os.Getwd()
 	if werr != nil {
@@ -175,11 +175,11 @@ func (b *Builder) pack_res() {
 
 	_, ex := os.Stat("dist/res")
 	if os.IsNotExist(ex) {
-		os.Chdir("dist")
-		os.Mkdir("res", os.ModePerm)
-		os.Chdir("res")
-		os.Mkdir("skin", os.ModePerm)
-		os.Chdir("../..")
+		_ = os.Chdir("dist")
+		_ = os.Mkdir("res", os.ModePerm)
+		_ = os.Chdir("res")
+		_ = os.Mkdir("skin", os.ModePerm)
+		_ = os.Chdir("../..")
 	}
 
 	_, roex := os.Stat("skin/static")
@@ -212,27 +212,27 @@ func (b *Builder) pack_res() {
 
 }
 
-func make_file_name(title string, smp TimeStamp) string {
+func makeFileName(title string, smp TimeStamp) string {
 	timesp := smp.StampSize()
 
-	var file_title string
+	var fileTitle string
 
 	if len(title) > 10 {
-		file_title = title[:10]
+		fileTitle = title[:10]
 	} else {
-		file_title = title
+		fileTitle = title
 	}
 
-	file_title = base64.StdEncoding.EncodeToString([]byte(file_title))
+	fileTitle = base64.StdEncoding.EncodeToString([]byte(fileTitle))
 
-	fname := strconv.Itoa(int(timesp)) + "-" + file_title + ".html"
+	fname := strconv.Itoa(timesp) + "-" + fileTitle + ".html"
 	return fname
 }
 
 func (b *Builder) Build() {
-	b.PostList = make([]Document_Meta, 0)
+	b.PostList = make([]DocumentMeta, 0)
 
-	b.Skin.Get_skin()
+	b.Skin.GetSkin()
 
 	wd, derr := os.Getwd()
 	workd := wd + "/post/"
@@ -247,12 +247,12 @@ func (b *Builder) Build() {
 		panic(rderr)
 	}
 
-	var BuildTargets []string = make([]string, 0)
+	var BuildTargets = make([]string, 0)
 
 	for _, ctx := range dir {
 		name := ctx.Name()
 		if strings.ContainsAny(name, ".ps") && (name != "about.ps") && (!ctx.Type().IsDir()) {
-			BuildTargets = append(BuildTargets, (workd + name))
+			BuildTargets = append(BuildTargets, workd+name)
 		}
 	}
 
@@ -260,24 +260,24 @@ func (b *Builder) Build() {
 
 	_, exerr := os.Stat("dist")
 	if os.IsNotExist(exerr) {
-		os.Mkdir("dist", os.ModePerm)
-		os.Chdir("dist")
-		os.Mkdir("page", os.ModePerm)
-		os.Chdir("..")
+		_ = os.Mkdir("dist", os.ModePerm)
+		_ = os.Chdir("dist")
+		_ = os.Mkdir("page", os.ModePerm)
+		_ = os.Chdir("..")
 	}
 
 	for _, ctx := range BuildTargets {
-		content, dmeta, iscom := b.build_page(ctx)
+		content, dmeta, iscom := b.buildPage(ctx)
 		if !iscom {
 			continue
 		}
 
-		name := make_file_name(dmeta.Title, dmeta.Timestamp)
+		name := makeFileName(dmeta.Title, dmeta.Timestamp)
 		fdir := wd + "/dist/page/" + name
 
 		fmt.Println(" => ", name)
 
-		os.WriteFile(fdir, []byte(content), 0777)
+		_ = os.WriteFile(fdir, []byte(content), 0777)
 
 		dmeta.Path = name
 		b.PostList = append(b.PostList, dmeta)
@@ -287,17 +287,17 @@ func (b *Builder) Build() {
 		return b.PostList[i].Timestamp.StampSize() < b.PostList[j].Timestamp.StampSize()
 	})
 
-	indext := b.build_index()
+	indext := b.buildIndex()
 	indexpath := wd + "/dist/index.html"
 
-	os.WriteFile(indexpath, []byte(indext), 0777)
+	_ = os.WriteFile(indexpath, []byte(indext), 0777)
 
 	_, ex := os.Stat(wd + "/post/about.ps")
 	if !os.IsNotExist(ex) {
-		about_ctx := b.build_about_page()
-		about_path := wd + "/dist/about.html"
-		os.WriteFile(about_path, []byte(about_ctx), 0777)
+		aboutCtx := b.buildAboutPage()
+		aboutPath := wd + "/dist/about.html"
+		_ = os.WriteFile(aboutPath, []byte(aboutCtx), 0777)
 	}
 
-	b.pack_res()
+	b.packRes()
 }

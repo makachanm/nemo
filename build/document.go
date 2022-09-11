@@ -17,7 +17,7 @@ type TimeStamp struct {
 	Min   int
 }
 
-type Document_Meta struct {
+type DocumentMeta struct {
 	Title     string
 	Timestamp TimeStamp
 	Summary   string
@@ -25,7 +25,7 @@ type Document_Meta struct {
 }
 
 type Document struct {
-	Meta    Document_Meta
+	Meta    DocumentMeta
 	Head    Header
 	Foot    Footer
 	Nav     Nav
@@ -49,14 +49,14 @@ type Nav struct {
 }
 
 type IndexPage struct {
-	Indexs []Document_Meta
+	Indexs []DocumentMeta
 	Head   Header
 	Foot   Footer
 	Nav    Nav
 }
 
-func MakeMetaData() Document_Meta {
-	return Document_Meta{}
+func MakeMetaData() DocumentMeta {
+	return DocumentMeta{}
 }
 
 func NewDocument() Document {
@@ -82,40 +82,40 @@ func (t *TimeStamp) StampSize() int {
 }
 
 func (d *Document) ParseMeta(input string) {
-	var metadata Document_Meta = MakeMetaData()
+	var metadata = MakeMetaData()
 
 	lexer := nemomark.NewLexer()
 	parser := nemomark.NewParser()
 
 	lexed := lexer.Tokenize(input, nemomark.TokenMap)
-	parse_result := parser.Parse(&lexed)
+	parseResult := parser.Parse(&lexed)
 
-	for _, ctx := range parse_result.Child {
-		switch ctx.Func_context.Fucntion_name {
+	for _, ctx := range parseResult.Child {
+		switch ctx.FuncContext.FucntionName {
 		case "title":
-			metadata.Title = ctx.Func_context.Context[0]
+			metadata.Title = ctx.FuncContext.Context[0]
 
 		case "summary":
-			metadata.Summary = ctx.Func_context.Context[0]
+			metadata.Summary = ctx.FuncContext.Context[0]
 
 		case "timestamp":
-			year, yerr := strconv.Atoi(ctx.Func_context.Args["year"])
+			year, yerr := strconv.Atoi(ctx.FuncContext.Args["year"])
 			if yerr != nil {
 				year = 0
 			}
-			month, merr := strconv.Atoi(ctx.Func_context.Args["month"])
+			month, merr := strconv.Atoi(ctx.FuncContext.Args["month"])
 			if merr != nil {
 				month = 0
 			}
-			date, derr := strconv.Atoi(ctx.Func_context.Args["day"])
+			date, derr := strconv.Atoi(ctx.FuncContext.Args["day"])
 			if derr != nil {
 				date = 0
 			}
-			hour, derr := strconv.Atoi(ctx.Func_context.Args["hour"])
+			hour, derr := strconv.Atoi(ctx.FuncContext.Args["hour"])
 			if derr != nil {
 				hour = 0
 			}
-			min, derr := strconv.Atoi(ctx.Func_context.Args["min"])
+			min, derr := strconv.Atoi(ctx.FuncContext.Args["min"])
 			if derr != nil {
 				min = 0
 			}
@@ -136,7 +136,7 @@ func BuildHeader(skin Skin, Ctx interface{}) Header {
 	}
 
 	var writer bytes.Buffer
-	t.Execute(&writer, Ctx)
+	_ = t.Execute(&writer, Ctx)
 
 	var head Header
 	head.Header = writer.String()
@@ -152,7 +152,7 @@ func BuildFooter(skin Skin, Ctx interface{}) Footer {
 	}
 
 	var writer bytes.Buffer
-	t.Execute(&writer, Ctx)
+	_ = t.Execute(&writer, Ctx)
 
 	var foot Footer
 	foot.Footer = writer.String()
@@ -168,7 +168,7 @@ func BuildNav(skin Skin, Ctx interface{}) Nav {
 	}
 
 	var writer bytes.Buffer
-	t.Execute(&writer, Ctx)
+	_ = t.Execute(&writer, Ctx)
 
 	var nav Nav
 	nav.Navbar = writer.String()

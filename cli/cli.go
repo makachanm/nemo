@@ -5,14 +5,14 @@ import (
 	"nemo/build"
 )
 
-type CliInterface struct {
+type Interface struct {
 }
 
-func MakeCli() CliInterface {
-	return CliInterface{}
+func MakeCli() Interface {
+	return Interface{}
 }
 
-func (ci *CliInterface) Handle(args []string) {
+func (ci *Interface) Handle(args []string) {
 	if len(args) < 2 {
 		fmt.Println("not enough arguments")
 		return
@@ -20,11 +20,11 @@ func (ci *CliInterface) Handle(args []string) {
 
 	switch args[1] {
 	case "build":
-		build_handler()
+		buildHandler()
 	}
 }
 
-func build_handler() {
+func buildHandler() {
 	b := build.MakeNewBuilder()
 	b.Build()
 }

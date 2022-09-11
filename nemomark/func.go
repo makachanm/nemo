@@ -2,7 +2,7 @@ package nemomark
 
 import "strings"
 
-var Markdown_Handlers = map[string]func(MarkdownFucntion) string{
+var MarkdownHandlers = map[string]func(MarkdownFucntion) string{
 	"bold":      bold,
 	"italic":    italic,
 	"cancel":    strikehrough,

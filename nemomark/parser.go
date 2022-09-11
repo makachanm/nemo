@@ -4,110 +4,110 @@ import (
 	"strings"
 )
 
-type lexer struct {
+type Lexer struct {
 }
 
-type parser struct {
-	func_buffer BlockStack
-	bcounter    BraketCounter
+type Parser struct {
+	funcBuffer BlockStack
+	bcounter   BraketCounter
 }
 
-func NewLexer() lexer {
-	return lexer{}
+func NewLexer() Lexer {
+	return Lexer{}
 }
 
-func NewParser() parser {
-	return parser{
-		func_buffer: NewBlockStack(),
-		bcounter:    MakeBraketCounter(),
+func NewParser() Parser {
+	return Parser{
+		funcBuffer: NewBlockStack(),
+		bcounter:   MakeBraketCounter(),
 	}
 }
 
-func return_string(s *string, idx int) string {
+func returnString(s *string, idx int) string {
 	return string((*s)[idx])
 }
 
-func add_block(b *[]Block, t Token, i string) []Block {
-	return append((*b), Block{token: t, item: i})
+func addBlock(b *[]Block, t Token, i string) []Block {
+	return append(*b, Block{token: t, item: i})
 }
 
-func append_eol(b *[]Block) []Block {
-	return append((*b), Block{token: TOKEN_EOL})
+func appendEol(b *[]Block) []Block {
+	return append(*b, Block{token: TokenEol})
 }
 
-func (l *lexer) Tokenize(input string, tokenmap map[string]Token) []Block {
+func (l *Lexer) Tokenize(input string, tokenmap map[string]Token) []Block {
 	var Blocks []Block
-	var pointer int = 0
-	var lengths int = len(input)
+	var pointer = 0
+	var lengths = len(input)
 
 	for pointer < lengths {
-		current_string := return_string(&input, pointer)
-		token_val, key_exist := tokenmap[current_string]
+		currentString := returnString(&input, pointer)
+		tokenVal, keyExist := tokenmap[currentString]
 
-		if key_exist {
-			if token_val == TOKEN_IGNORE {
+		if keyExist {
+			if tokenVal == TokenIgnore {
 				iidx := pointer
-				iis_break := (token_val == TOKEN_IGNORE)
+				iisBreak := tokenVal == TokenIgnore
 
-				for iis_break {
+				for iisBreak {
 					//Check idx is smaller than lengths. make break when string pointer is encountered eol.
 					if (iidx + 1) == lengths {
 						iidx++ //increase pointer
 						break
 					}
-					t, r := tokenmap[return_string(&input, (iidx+1))]
-					iis_break = !(r && t == TOKEN_IGNORE)
+					t, r := tokenmap[returnString(&input, iidx+1)]
+					iisBreak = !(r && t == TokenIgnore)
 					iidx++
 				}
 
-				Blocks = add_block(&Blocks, TOKEN_STRING, input[(pointer+1):iidx])
+				Blocks = addBlock(&Blocks, TokenString, input[(pointer+1):iidx])
 				pointer = (iidx - pointer) + pointer + 1
 
 			} else {
 				//Tokenize current string.
-				Blocks = add_block(&Blocks, token_val, "")
+				Blocks = addBlock(&Blocks, tokenVal, "")
 				pointer++
 			}
 
 		} else {
 			//Make current text pointer to normal string.
 			idx := pointer //String tokenizer pointer
-			is_break := key_exist
-			for !is_break { //loop until enconter another token.
+			isBreak := keyExist
+			for !isBreak { //loop until enconter another token.
 				//Check idx is smaller than lengths. make break when string pointer is encountered eol.
 				if (idx + 1) == lengths {
 					idx++ //increase pointer
 					break
 				}
 				//Check token.
-				_, is_break = tokenmap[return_string(&input, (idx+1))]
+				_, isBreak = tokenmap[returnString(&input, idx+1)]
 				idx++ //increase pointer (not eol)
 			}
 			//Cut string and tokenize. [Strat of Stirng to End of String]
-			Blocks = add_block(&Blocks, TOKEN_STRING, input[pointer:idx])
+			Blocks = addBlock(&Blocks, TokenString, input[pointer:idx])
 			pointer = (idx - pointer) + pointer
 		}
 	}
 	//Append EOL token.
-	Blocks = append_eol(&Blocks)
+	Blocks = appendEol(&Blocks)
 
 	return Blocks
 }
 
-func (p *parser) Parse(input *[]Block) ExprNode {
-	var Blocks []Block = (*input)
-	var Head ExprNode = MakeExprNode(TYPE_SECTION, nil) //Head of tree.
-	var pointer int = 0
-	var lengths int = len(Blocks)
+func (p *Parser) Parse(input *[]Block) ExprNode {
+	var Blocks = *input
+	var Head = MakeExprNode(TypeSection, nil) //Head of tree.
+	var pointer = 0
+	var lengths = len(Blocks)
 
-	var Stack BlockStack = NewBlockStack() //Stack for StackParse.
+	var Stack = NewBlockStack() //Stack for StackParse.
 
 	for pointer < lengths {
-		Stack.block_push(Blocks[pointer])
-		parsed := p.stack_parse(&Stack)
-		if parsed.Context != nil || parsed.Func_context.Fucntion_name != "" {
+		Stack.blockPush(Blocks[pointer])
+		parsed := p.stackParse(&Stack)
+		if parsed.Context != nil || parsed.FuncContext.FucntionName != "" {
 			// Check Node's context is not a nil and Node is valid function node.
-			Head.single_insert(parsed)
+			Head.singleInsert(parsed)
 		}
 		pointer++
 	}
@@ -115,49 +115,49 @@ func (p *parser) Parse(input *[]Block) ExprNode {
 	return Head
 }
 
-func (p *parser) stack_parse(input *BlockStack) ExprNode {
+func (p *Parser) stackParse(input *BlockStack) ExprNode {
 	var object ExprNode
 
 	switch input.seek().token {
-	case TOKEN_STRING:
-		if p.func_buffer.length() > 1 { //Check another block is exist in stack.
-			p.func_buffer.block_push(input.block_pop())
+	case TokenString:
+		if p.funcBuffer.length() > 1 { //Check another block is existed in stack.
+			p.funcBuffer.blockPush(input.blockPop())
 			break
 		}
-		item := input.block_pop().item
+		item := input.blockPop().item
 
-		string_th := []string{item}
-		object = MakeExprNode(TYPE_STRING, string_th)
+		stringTh := []string{item}
+		object = MakeExprNode(TypeString, stringTh)
 
-	case TOKEN_BLOCK_START:
-		open_token := input.block_pop()
-		p.bcounter.inc_open()
-		p.func_buffer.block_push(open_token)
+	case TokenBlockStart:
+		openToken := input.blockPop()
+		p.bcounter.incOpen()
+		p.funcBuffer.blockPush(openToken)
 
-	case TOKEN_BLOCK_END:
-		close_token := input.block_pop()
-		p.bcounter.inc_close()
-		p.func_buffer.block_push(close_token)
+	case TokenBlockEnd:
+		closeToken := input.blockPop()
+		p.bcounter.incClose()
+		p.funcBuffer.blockPush(closeToken)
 
-		func_parsed, is_parsed := p.func_parse(&p.func_buffer)
+		funcParsed, isParsed := p.funcParse(&p.funcBuffer)
 
-		if is_parsed {
-			object = func_parsed
+		if isParsed {
+			object = funcParsed
 		}
 
 	default:
-		p.func_buffer.block_push(input.block_pop())
-		func_parsed, is_parsed := p.func_parse(&p.func_buffer)
+		p.funcBuffer.blockPush(input.blockPop())
+		funcParsed, isParsed := p.funcParse(&p.funcBuffer)
 
-		if is_parsed {
-			object = func_parsed
+		if isParsed {
+			object = funcParsed
 		}
 	}
 
 	return object
 }
 
-func (p *parser) func_parse(input *BlockStack) (ExprNode, bool) {
+func (p *Parser) funcParse(input *BlockStack) (ExprNode, bool) {
 	var object ExprNode
 
 	frame := *(input)
@@ -168,41 +168,41 @@ func (p *parser) func_parse(input *BlockStack) (ExprNode, bool) {
 	}
 
 	//Check function is closed.
-	if !(frame.seek().token == TOKEN_BLOCK_END) {
+	if !(frame.seek().token == TokenBlockEnd) {
 		return object, false
 	}
 
 	//Check open token and close token is all pushed to stack.
-	if !(p.bcounter.is_blocked()) {
+	if !(p.bcounter.isBlocked()) {
 		return object, false
 	}
 
-	//Check function is starting with function symbol, Check function open token is exist in right place.
+	//Check function is starting with function symbol, Check function open token is existed in right place.
 	//Clear buffer when token block position is not correct.
-	if !(frame.block_list[0].token == TOKEN_FUNC && frame.block_list[1].token == TOKEN_BLOCK_START) {
+	if !(frame.blockList[0].token == TokenFunc && frame.blockList[1].token == TokenBlockStart) {
 		input.clear()
 		return object, false
 	}
 
 	//Is context string is Exist?
-	if frame.block_list[2].token == TOKEN_STRING {
-		func_data := frame.block_list[2]              //Get context.
-		splited := strings.Split(func_data.item, " ") //Split string to parse function name & args
+	if frame.blockList[2].token == TokenString {
+		funcData := frame.blockList[2]               //Get context.
+		splited := strings.Split(funcData.item, " ") //Split string to parse function name & args
 
-		func_name := splited[0]                          //Get function name.
-		p_func_context := strings.Join(splited[1:], " ") //Join remain strings to one context value.
+		funcName := splited[0]                         //Get function name.
+		pFuncContext := strings.Join(splited[1:], " ") //Join remain strings to one context value.
 
-		var fnargs map[string]string = make(map[string]string)
+		var fnargs = make(map[string]string)
 
-		if strings.ContainsAny(func_name, "(") && strings.ContainsAny(func_name, ")") {
-			startpoint := strings.Index(func_name, "(")
-			endpoint := strings.Index(func_name, ")")
+		if strings.ContainsAny(funcName, "(") && strings.ContainsAny(funcName, ")") {
+			startpoint := strings.Index(funcName, "(")
+			endpoint := strings.Index(funcName, ")")
 
-			argstr := func_name[(startpoint + 1):endpoint]
-			func_name = func_name[0:startpoint]
+			argstr := funcName[(startpoint + 1):endpoint]
+			funcName = funcName[0:startpoint]
 
-			args_splited := strings.Split(argstr, ",")
-			for _, value := range args_splited {
+			argsSplited := strings.Split(argstr, ",")
+			for _, value := range argsSplited {
 				if strings.ContainsAny(value, "=") {
 					args := strings.Split(value, "=")
 					fnargs[args[0]] = strings.Join(args[1:], "")
@@ -210,15 +210,15 @@ func (p *parser) func_parse(input *BlockStack) (ExprNode, bool) {
 			}
 		}
 
-		object = MakeFunctionNode(func_name, fnargs, []string{p_func_context})
+		object = MakeFunctionNode(funcName, fnargs, []string{pFuncContext})
 
-		//If inner-function is exist?
-		if frame.block_list[3].token == TOKEN_FUNC {
-			var inner_func_stack BlockStack
-			inner_func_stack.append_stack(frame, 3, (frame.length() - 1))
+		//If inner-function is existed?
+		if frame.blockList[3].token == TokenFunc {
+			var innerFuncStack BlockStack
+			innerFuncStack.appendStack(frame, 3, frame.length()-1)
 
-			p.bcounter.dec_counter()
-			obj, innerft := p.parse_inner_block(inner_func_stack)
+			p.bcounter.decCounter()
+			obj, innerft := p.parseInnerBlock(innerFuncStack)
 			if innerft {
 				object.insert(obj)
 			}
@@ -228,19 +228,19 @@ func (p *parser) func_parse(input *BlockStack) (ExprNode, bool) {
 
 	}
 
-	p.bcounter.dec_counter()
+	p.bcounter.decCounter()
 
 	return object, true
 }
 
-func (p *parser) parse_inner_block(input BlockStack) ([]ExprNode, bool) {
-	var position []int = make([]int, 0)               //Position of deffunc
-	var parse_list []BlockStack                       //Parsed Innerfuncs
-	var bkcounter BraketCounter = MakeBraketCounter() //Counter for parse innerfunc braket
+func (p *Parser) parseInnerBlock(input BlockStack) ([]ExprNode, bool) {
+	var position = make([]int, 0)       //Position of deffunc
+	var parseList []BlockStack          //Parsed Innerfuncs
+	var bkcounter = MakeBraketCounter() //Counter for parse innerfunc braket
 	var object []ExprNode
 
-	for idx, item := range input.block_list {
-		if item.token == TOKEN_FUNC {
+	for idx, item := range input.blockList {
+		if item.token == TokenFunc {
 			position = append(position, idx)
 		}
 	}
@@ -252,29 +252,29 @@ func (p *parser) parse_inner_block(input BlockStack) ([]ExprNode, bool) {
 
 	pointer := 0
 	ipos := 0
-	for pointer < len(input.block_list) {
-		switch input.block_list[pointer].token {
-		case TOKEN_BLOCK_START:
-			bkcounter.inc_open()
-		case TOKEN_BLOCK_END:
-			bkcounter.inc_close()
+	for pointer < len(input.blockList) {
+		switch input.blockList[pointer].token {
+		case TokenBlockStart:
+			bkcounter.incOpen()
+		case TokenBlockEnd:
+			bkcounter.incClose()
 		}
 
-		if bkcounter.is_blocked() && (bkcounter.open > 0 && bkcounter.close > 0) {
+		if bkcounter.isBlocked() && (bkcounter.open > 0 && bkcounter.close > 0) {
 			end := pointer + 1
 			start := position[ipos]
 
-			inner_func_stk := NewBlockStack()
-			inner_func_stk.append_stack(input, start, end)
+			innerFuncStk := NewBlockStack()
+			innerFuncStk.appendStack(input, start, end)
 
-			parse_list = append(parse_list, inner_func_stk)
+			parseList = append(parseList, innerFuncStk)
 			bkcounter.clear()
 
 			for pi, t := range position {
 				if t > pointer {
 					ipos = pi
 					pointer = position[pi]
-					inner_func_stk.clear()
+					innerFuncStk.clear()
 					break
 				}
 			}
@@ -284,9 +284,9 @@ func (p *parser) parse_inner_block(input BlockStack) ([]ExprNode, bool) {
 		pointer++
 	}
 
-	for _, context := range parse_list {
-		pased, is_pased := p.func_parse(&context)
-		if is_pased {
+	for _, context := range parseList {
+		pased, isPased := p.funcParse(&context)
+		if isPased {
 			object = append(object, pased)
 		}
 	}

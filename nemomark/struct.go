@@ -9,22 +9,22 @@ type Block struct {
 }
 
 type BlockStack struct {
-	block_list []Block
+	blockList []Block
 }
 
 type ExprNode struct {
-	Node_type        NodeType
-	Func_context     MarkdownFucntion
-	Context          []string
-	Has_child        bool
-	Is_funciton_node bool
-	Child            []ExprNode
+	NodeType       NodeType
+	FuncContext    MarkdownFucntion
+	Context        []string
+	HasChild       bool
+	IsFuncitonNode bool
+	Child          []ExprNode
 }
 
 type MarkdownFucntion struct {
-	Fucntion_name string
-	Args          map[string]string
-	Context       []string
+	FucntionName string
+	Args         map[string]string
+	Context      []string
 }
 
 type BraketCounter struct {
@@ -33,48 +33,47 @@ type BraketCounter struct {
 }
 
 const (
-	TOKEN_BLOCK_START Token = iota
-	TOKEN_BLOCK_END
-	TOKEN_EOL
-	TOKEN_STRING
-	TOKEN_FUNC
-	TOKEN_IGNORE
+	TokenBlockStart Token = iota
+	TokenBlockEnd
+	TokenEol
+	TokenString
+	TokenFunc
+	TokenIgnore
 )
 
 const (
-	TYPE_ORIGIN NodeType = iota
-	TYPE_SECTION
-	TYPE_FUNC
-	TYPE_STRING
+	TypeSection NodeType = iota
+	TypeFunc
+	TypeString
 )
 
 var TokenMap = map[string]Token{
-	"$": TOKEN_FUNC,
-	"[": TOKEN_BLOCK_START,
-	"]": TOKEN_BLOCK_END,
-	"`": TOKEN_IGNORE,
+	"$": TokenFunc,
+	"[": TokenBlockStart,
+	"]": TokenBlockEnd,
+	"`": TokenIgnore,
 }
 
 func NewBlockStack() BlockStack {
-	return BlockStack{block_list: []Block{}}
+	return BlockStack{blockList: []Block{}}
 }
 
 func MakeExprNode(p NodeType, c []string) ExprNode {
 	return ExprNode{
-		Node_type: p,
-		Context:   c,
+		NodeType: p,
+		Context:  c,
 	}
 }
 
 func MakeFunctionNode(fcname string, args map[string]string, context []string) ExprNode {
-	mk_func := MarkdownFucntion{
-		Fucntion_name: fcname,
-		Args:          args,
-		Context:       context,
+	mkFunc := MarkdownFucntion{
+		FucntionName: fcname,
+		Args:         args,
+		Context:      context,
 	}
-	exnode := MakeExprNode(TYPE_FUNC, nil)
-	exnode.set_is_function(true)
-	exnode.set_func_context(mk_func)
+	exnode := MakeExprNode(TypeFunc, nil)
+	exnode.setIsFunction(true)
+	exnode.setFuncContext(mkFunc)
 
 	return exnode
 }
@@ -86,85 +85,85 @@ func MakeBraketCounter() BraketCounter {
 	}
 }
 
-func (s *BlockStack) append_stack(si BlockStack, start int, end int) {
-	s.block_list = append(s.block_list, si.block_list[start:end]...)
+func (s *BlockStack) appendStack(si BlockStack, start int, end int) {
+	s.blockList = append(s.blockList, si.blockList[start:end]...)
 }
 
-func (s *BlockStack) block_push(b Block) {
-	s.block_list = append(s.block_list, b)
+func (s *BlockStack) blockPush(b Block) {
+	s.blockList = append(s.blockList, b)
 }
 
-func (s *BlockStack) block_pop() Block {
-	if len(s.block_list) == 0 {
+func (s *BlockStack) blockPop() Block {
+	if len(s.blockList) == 0 {
 		return Block{}
 	}
-	data := s.block_list[(len(s.block_list) - 1)]
-	s.block_list = s.block_list[:(len(s.block_list) - 1)]
+	data := s.blockList[(len(s.blockList) - 1)]
+	s.blockList = s.blockList[:(len(s.blockList) - 1)]
 	return data
 }
 
-//BlockStack
+// BlockStack
 func (s *BlockStack) clear() []Block {
-	data := s.block_list
-	s.block_list = nil
+	data := s.blockList
+	s.blockList = nil
 	return data
 }
 
 func (s *BlockStack) length() int {
-	return len(s.block_list)
+	return len(s.blockList)
 }
 
 func (s *BlockStack) seek() Block {
-	if len(s.block_list) == 0 {
+	if len(s.blockList) == 0 {
 		return Block{}
 	}
-	return s.block_list[(len(s.block_list) - 1)]
+	return s.blockList[(len(s.blockList) - 1)]
 }
 
-//ExprNode
-func (e *ExprNode) single_insert(c ExprNode) {
+// ExprNode
+func (e *ExprNode) singleInsert(c ExprNode) {
 	e.Child = append(e.Child, c)
-	e.set_has_child(true)
+	e.setHasChild(true)
 }
 
 func (e *ExprNode) insert(c []ExprNode) {
 	e.Child = append(e.Child, c...)
-	e.set_has_child(true)
+	e.setHasChild(true)
 }
 
-func (e *ExprNode) set_has_child(b bool) {
-	e.Has_child = b
+func (e *ExprNode) setHasChild(b bool) {
+	e.HasChild = b
 }
 
-func (e *ExprNode) set_is_function(b bool) {
-	e.Is_funciton_node = b
+func (e *ExprNode) setIsFunction(b bool) {
+	e.IsFuncitonNode = b
 }
 
-func (e *ExprNode) set_func_context(c MarkdownFucntion) {
-	e.Func_context = c
+func (e *ExprNode) setFuncContext(c MarkdownFucntion) {
+	e.FuncContext = c
 }
 
 //BraketCounter
 
-func (b *BraketCounter) inc_open() {
+func (b *BraketCounter) incOpen() {
 	b.open++
 }
 
-func (b *BraketCounter) inc_close() {
+func (b *BraketCounter) incClose() {
 	b.close++
 }
 
-func (b *BraketCounter) dec_open() {
+func (b *BraketCounter) decOpen() {
 	b.open--
 }
 
-func (b *BraketCounter) dec_close() {
+func (b *BraketCounter) decClose() {
 	b.close--
 }
 
-func (b *BraketCounter) dec_counter() {
-	b.dec_open()
-	b.dec_close()
+func (b *BraketCounter) decCounter() {
+	b.decOpen()
+	b.decClose()
 }
 
 func (b *BraketCounter) clear() {
@@ -172,6 +171,6 @@ func (b *BraketCounter) clear() {
 	b.close = 0
 }
 
-func (b *BraketCounter) is_blocked() bool {
-	return (b.open == b.close)
+func (b *BraketCounter) isBlocked() bool {
+	return b.open == b.close
 }

@@ -31,7 +31,7 @@ func MakeSkin() Skin {
 	return Skin{}
 }
 
-func (s *Skin) Get_skin() {
+func (s *Skin) GetSkin() {
 	skinpath, perr := os.Getwd()
 
 	if perr != nil {
@@ -44,7 +44,7 @@ func (s *Skin) Get_skin() {
 		panic(ferr)
 	}
 
-	var sinfo SkinInfo = SkinInfo{}
+	var sinfo = SkinInfo{}
 	jerr := json.Unmarshal(ctx, &sinfo)
 
 	if jerr != nil {
@@ -53,17 +53,17 @@ func (s *Skin) Get_skin() {
 
 	s.Info = sinfo
 
-	var infos SkinInfo = SkinInfo{}
+	var infos = SkinInfo{}
 
 	ref := reflect.ValueOf(&sinfo.Paths).Elem()
 	sref := reflect.ValueOf(&infos.Paths).Elem()
 
 	for i := 0; i < ref.NumField(); i++ {
-		pelm_val := ref.Field(i)
-		pelm_typ := ref.Type().Field(i)
+		pelmVal := ref.Field(i)
+		pelmTyp := ref.Type().Field(i)
 
-		srefval := sref.FieldByName(pelm_typ.Name)
-		pval := skinpath + (pelm_val.Interface().(string))
+		srefval := sref.FieldByName(pelmTyp.Name)
+		pval := skinpath + (pelmVal.Interface().(string))
 		srefval.SetString(pval)
 	}
 

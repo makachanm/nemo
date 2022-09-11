@@ -1,9 +1,9 @@
 package nemomark
 
 type Nemomark struct {
-	lexer    lexer
-	parser   parser
-	renderer renderer
+	lexer    Lexer
+	parser   Parser
+	renderer Renderer
 }
 
 func MakeNemomark() Nemomark {

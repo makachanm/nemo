@@ -8,16 +8,16 @@ import (
 	"strings"
 )
 
-func DirCopy(src_p string, des_p string) error {
-	err := filepath.Walk(src_p, func(path string, info fs.FileInfo, err error) error {
+func DirCopy(srcP string, desP string) error {
+	err := filepath.Walk(srcP, func(path string, info fs.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
 
-		opath := filepath.Join(des_p, strings.TrimPrefix(path, src_p))
+		opath := filepath.Join(desP, strings.TrimPrefix(path, srcP))
 
 		if info.IsDir() {
-			os.MkdirAll(opath, info.Mode().Perm())
+			_ = os.MkdirAll(opath, info.Mode().Perm())
 			return nil
 		}
 
@@ -25,15 +25,25 @@ func DirCopy(src_p string, des_p string) error {
 		if oerr != nil {
 			return oerr
 		}
-		defer op.Close()
+		defer func(op *os.File) {
+			err := op.Close()
+			if err != nil {
+
+			}
+		}(op)
 
 		dp, derr := os.Create(opath)
 		if derr != nil {
 			return derr
 		}
-		defer dp.Close()
+		defer func(dp *os.File) {
+			err := dp.Close()
+			if err != nil {
 
-		dp.Chmod(info.Mode())
+			}
+		}(dp)
+
+		_ = dp.Chmod(info.Mode())
 
 		_, cerr := io.Copy(dp, op)
 		return cerr
