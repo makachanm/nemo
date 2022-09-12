@@ -14,6 +14,7 @@ Before you start, You must install skin to /skin directory.
 Read guide about setting up skin for your workspace.`
 
 func createNewSpace() {
+	wd, _ := os.Getwd()
 	_, postexist := os.Stat("post")
 	_, skinexist := os.Stat("skin")
 	_, maniexist := os.Stat("manifest.json")
@@ -56,6 +57,10 @@ func createNewSpace() {
 	if ferr != nil {
 		panic(ferr)
 	}
+
+	os.WriteFile((wd + "/post/about.ps"), []byte("Write about message here."), 0777)
+	os.Chdir("post")
+	os.Mkdir("res", os.ModePerm)
 
 	fmt.Println("Build Complete")
 	fmt.Println(StartMessage)
