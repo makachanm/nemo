@@ -39,7 +39,7 @@ func (s *Skin) GetSkin() {
 		panic(perr)
 	}
 
-	_, skinexist := os.Stat(skinpath + "/skin")
+	_, skinexist := os.Stat(skinpath + "/skin/skin.json")
 	if os.IsNotExist(skinexist) {
 		fmt.Println("Skin is not exist")
 		os.Exit(1)
