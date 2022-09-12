@@ -22,6 +22,12 @@ func (ci *Interface) Handle(args []string) {
 	case "build":
 		buildHandler()
 
+	case "newpost":
+		GeneratePost()
+
+	case "create":
+		createNewSpace()
+
 	default:
 		fmt.Println("unknown command")
 	}
