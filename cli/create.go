@@ -11,7 +11,7 @@ import (
 const StartMessage = `==--------------==
 New workspace is created.
 Before you start, You must install skin to /skin directory.
-Read guide for setting up your skin for your workspace.`
+Read guide about setting up skin for your workspace.`
 
 func createNewSpace() {
 	_, postexist := os.Stat("post")
