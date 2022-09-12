@@ -8,6 +8,10 @@ import (
 	"os"
 )
 
+const StartMessage = `New workspace is created.
+\nBefore you start, You must install skin to /skin directory.
+\nRead guide for setting up your skin for your workspace.`
+
 func createNewSpace() {
 	_, postexist := os.Stat("post")
 	_, skinexist := os.Stat("skin")
@@ -53,4 +57,5 @@ func createNewSpace() {
 	}
 
 	fmt.Println("Build Complete")
+	fmt.Println(StartMessage)
 }
