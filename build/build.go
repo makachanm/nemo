@@ -210,6 +210,9 @@ func (b *Builder) packRes() {
 	_ = os.Chdir(wd)
 
 	skinfiles, _ := os.ReadDir(skinsrc)
+	if len(skinfiles) == 0 {
+		panic("skin/static resource not found.")
+	}
 	for _, file := range skinfiles {
 		skinfile, status := os.ReadFile(skinsrc + "/" + file.Name())
 		if status != nil {
@@ -219,6 +222,10 @@ func (b *Builder) packRes() {
 		if cerr != nil {
 			panic(cerr)
 		}
+	}
+	check, _ := os.ReadDir(skindst)
+	if len(check) == 0 {
+		panic("dist/res/skin resource not found.")
 	}
 
 	resrc := "./post/res"
@@ -236,6 +243,9 @@ func (b *Builder) packRes() {
 		if rerr != nil {
 			panic(rerr)
 		}
+	}
+	if len(check) == 0 {
+		panic("dist/res folder not found.")
 	}
 
 }
