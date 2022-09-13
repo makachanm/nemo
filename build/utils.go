@@ -1,47 +1,81 @@
 package build
 
 import (
+	"fmt"
 	"io"
-	"io/fs"
 	"os"
-	"path/filepath"
-	"strings"
 )
 
-func DirCopy(srcP string, desP string) error {
-	err := filepath.Walk(srcP, func(path string, info fs.FileInfo, err error) error {
+func DirCopy(src string, dst string) error {
+	// Get properties of source dir
+	srcInfo, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+
+	// Create destination dir
+	err = os.MkdirAll(dst, srcInfo.Mode())
+	if err != nil {
+		return err
+	}
+
+	directory, _ := os.Open(src)
+	objects, err := directory.Readdir(-1)
+
+	for _, obj := range objects {
+
+		srcPointer := src + "/" + obj.Name()
+		dstPointer := dst + "/" + obj.Name()
+
+		if obj.IsDir() {
+			// Create sub-directories - recursively
+			err = DirCopy(srcPointer, dstPointer)
+			if err != nil {
+				fmt.Println(err)
+			}
+		} else {
+			// Perform copy
+			err = FileCopy(srcPointer, dstPointer)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+
+	}
+	return nil
+}
+
+func FileCopy(src string, dst string) error {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer func(source *os.File) {
+		err := source.Close()
 		if err != nil {
-			return err
+			panic(err)
 		}
+	}(source)
 
-		opath := filepath.Join(desP, strings.TrimPrefix(path, srcP))
-
-		if info.IsDir() {
-			_ = os.MkdirAll(opath, info.Mode().Perm())
-			return nil
+	destination, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer func(destination *os.File) {
+		err := destination.Close()
+		if err != nil {
+			panic(err)
 		}
-
-		op, oerr := os.Open(path)
-		if oerr != nil {
-			return oerr
-		}
-		defer func(op *os.File) {
-			_ = op.Close()
-		}(op)
-
-		dp, derr := os.Create(opath)
-		if derr != nil {
-			return derr
-		}
-		defer func(dp *os.File) {
-			_ = dp.Close()
-		}(dp)
-
-		_ = dp.Chmod(info.Mode())
-
-		_, cerr := io.Copy(dp, op)
-		return cerr
-	})
-
+	}(destination)
+	_, err = io.Copy(destination, source)
 	return err
 }

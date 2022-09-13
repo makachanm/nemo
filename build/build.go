@@ -178,11 +178,6 @@ func (b *Builder) buildAboutPage() string {
 
 func (b *Builder) packRes() {
 
-	wd, werr := os.Getwd()
-	if werr != nil {
-		panic(werr)
-	}
-
 	_, ex := os.Stat("dist/res")
 	if os.IsNotExist(ex) {
 		_ = os.Chdir("dist")
@@ -204,48 +199,20 @@ func (b *Builder) packRes() {
 		return
 	}
 
-	skinsrc := "./skin/static"
-	skindst := "./dist/res/skin"
+	skinsrc := "./skin/static/"
+	skindet := "./dist/res/skin/"
 
-	_ = os.Chdir(wd)
-
-	skinfiles, _ := os.ReadDir(skinsrc)
-	if len(skinfiles) == 0 {
-		panic("skin/static resource not found.")
-	}
-	for _, file := range skinfiles {
-		skinfile, status := os.ReadFile(skinsrc + "/" + file.Name())
-		if status != nil {
-			panic(status)
-		}
-		cerr := os.WriteFile(skindst+"/"+file.Name(), skinfile, os.ModePerm)
-		if cerr != nil {
-			panic(cerr)
-		}
-	}
-	check, _ := os.ReadDir(skindst)
-	if len(check) == 0 {
-		panic("dist/res/skin resource not found.")
+	cerr := DirCopy(skinsrc, skindet)
+	if cerr != nil {
+		panic(cerr)
 	}
 
 	resrc := "./post/res"
-	resdst := "./dist/res"
+	resdet := "./dist/res"
 
-	_ = os.Chdir(wd)
-
-	resfiles, _ := os.ReadDir(resrc)
-	for _, file := range resfiles {
-		resfile, status := os.ReadFile(resrc + "/" + file.Name())
-		if status != nil {
-			panic(status)
-		}
-		rerr := os.WriteFile(resdst+"/"+file.Name(), resfile, os.ModePerm)
-		if rerr != nil {
-			panic(rerr)
-		}
-	}
-	if len(check) == 0 {
-		panic("dist/res folder not found.")
+	rerr := DirCopy(resrc, resdet)
+	if rerr != nil {
+		panic(rerr)
 	}
 
 }
