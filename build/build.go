@@ -204,20 +204,38 @@ func (b *Builder) packRes() {
 		return
 	}
 
-	skinsrc := wd + "/skin/static"
-	skindet := wd + "/dist/res/skin"
+	skinsrc := "./skin/static"
+	skindst := "./dist/res/skin"
 
-	cerr := DirCopy(skinsrc, skindet)
-	if cerr != nil {
-		panic(cerr)
+	_ = os.Chdir(wd)
+
+	skinfiles, _ := os.ReadDir(skinsrc)
+	for _, file := range skinfiles {
+		skinfile, status := os.ReadFile(skinsrc + "/" + file.Name())
+		if status != nil {
+			panic(status)
+		}
+		cerr := os.WriteFile(skindst+"/"+file.Name(), skinfile, os.ModePerm)
+		if cerr != nil {
+			panic(cerr)
+		}
 	}
 
-	ressrc := wd + "/post/res"
-	resdet := wd + "/dist/res"
+	resrc := "./post/res"
+	resdst := "./dist/res"
 
-	rerr := DirCopy(ressrc, resdet)
-	if rerr != nil {
-		panic(rerr)
+	_ = os.Chdir(wd)
+
+	resfiles, _ := os.ReadDir(resrc)
+	for _, file := range resfiles {
+		resfile, status := os.ReadFile(resrc + "/" + file.Name())
+		if status != nil {
+			panic(status)
+		}
+		rerr := os.WriteFile(resdst+"/"+file.Name(), resfile, os.ModePerm)
+		if rerr != nil {
+			panic(rerr)
+		}
 	}
 
 }
