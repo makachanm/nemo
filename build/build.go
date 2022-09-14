@@ -200,7 +200,7 @@ func (b *Builder) packRes() {
 	}
 
 	skinsrc := "./skin/static/"
-	skindet := "./dist/res/skin/"
+	skindet := "./dist/static/"
 
 	cerr := DirCopy(skinsrc, skindet)
 	if cerr != nil {
@@ -208,7 +208,7 @@ func (b *Builder) packRes() {
 	}
 
 	resrc := "./post/res"
-	resdet := "./dist/res"
+	resdet := "./dist/page/res"
 
 	rerr := DirCopy(resrc, resdet)
 	if rerr != nil {

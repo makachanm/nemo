@@ -1,6 +1,8 @@
 package nemomark
 
-import "strings"
+import (
+	"strings"
+)
 
 var MarkdownHandlers = map[string]func(MarkdownFucntion) string{
 	"bold":      bold,
@@ -8,6 +10,7 @@ var MarkdownHandlers = map[string]func(MarkdownFucntion) string{
 	"cancel":    strikehrough,
 	"underline": underline,
 	"link":      link,
+	"image":     image,
 }
 
 func RenderPlain(input []string) string {
@@ -44,4 +47,17 @@ func link(input MarkdownFucntion) string {
 	}
 
 	return `<a href="` + link + `">` + str + "</a>"
+}
+
+func image(input MarkdownFucntion) string {
+	altstr := strings.Join(input.Context, "")
+	src, isexist := input.Args["url"]
+
+	if !isexist {
+		return "alt: " + altstr
+	}
+
+	imgtag := `<img src="` + src + `" class="content-image" alt="` + altstr + `">`
+
+	return `<a href="` + src + `">` + imgtag + `</a>`
 }
