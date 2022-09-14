@@ -205,7 +205,8 @@ func (p *Parser) funcParse(input *BlockStack) (ExprNode, bool) {
 			for _, value := range argsSplited {
 				if strings.ContainsAny(value, "=") {
 					args := strings.Split(value, "=")
-					fnargs[args[0]] = strings.Join(args[1:], "")
+					carg := args[1:]
+					fnargs[args[0]] = strings.Join(carg, "=")
 				}
 			}
 		}
