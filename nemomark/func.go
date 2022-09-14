@@ -15,7 +15,8 @@ var MarkdownHandlers = map[string]func(MarkdownFucntion) string{
 
 func RenderPlain(input []string) string {
 	str := strings.Join(input, "")
-	return str
+	cstr := strings.ReplaceAll(str, "\n", "<br />")
+	return cstr
 }
 
 func bold(input MarkdownFucntion) string {
