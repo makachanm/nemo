@@ -44,7 +44,6 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	document := NewDocument()
 
 	document.Content = markup.Mark(strings.Join(postCtx[1:], ""))
-	//document.Content = strings.ReplaceAll(document.Content, "\n", "\n<br />")
 
 	document.ParseMeta(postCtx[0])
 
@@ -137,8 +136,6 @@ func (b *Builder) buildAboutPage() string {
 
 	document.Content = markup.Mark(postRawctx)
 
-	//document.Content = strings.ReplaceAll(document.Content, "\n", "\n<br />")
-
 	bname := b.Manifest.Name
 
 	headd := Header{IsNotIndex: false, BlogName: bname}
@@ -177,7 +174,7 @@ func (b *Builder) buildAboutPage() string {
 }
 
 func (b *Builder) packRes() {
-
+	//TODO: REMOVE
 	_, ex := os.Stat("dist")
 	if os.IsNotExist(ex) {
 		_ = os.Mkdir("dist", os.ModePerm)
