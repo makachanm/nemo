@@ -68,14 +68,13 @@ func (rd *Renderer) render(input ExprNode) string {
 	for _, node := range originChildNode {
 		rctx := rd.itemRender(node)
 		stringbuilder.WriteString(builded)
-		//ctx := "<p>" + rctx + "</p>"
 		stringbuilder.WriteString(rctx)
 
 		builded = stringbuilder.String()
 		stringbuilder.Reset()
 	}
 
-	//taggedResult := "<p>" + builded + "</p>"
-	//return taggedResult
-	return builded
+	taggedResult := "<p>" + builded + "</p>"
+	return taggedResult
+	//return builded
 }
