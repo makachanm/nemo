@@ -67,7 +67,7 @@ If you want use your own image,
  ``` $[image(url=./res/yourimage.png)] ```
 
 #### Code 
-*** RECOMMEND TO USE "IGNORE SYNTAX" ***
+**RECOMMEND TO USE "IGNORE SYNTAX"**
 ``` 
 $[code `
 func yourcode(foo strings[]){
