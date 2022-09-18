@@ -68,4 +68,5 @@ If you want use your own image,
 
 #### Code 
 **RECOMMEND TO USE "IGNORE SYNTAX"**
+
 ``` $[code `func yourcode(foo strings[]){ //This is Sample Code }`] ```
