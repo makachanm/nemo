@@ -79,7 +79,6 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	_ = t.Execute(&writer, document)
 
 	return writer.String(), document.Meta, true
-
 }
 
 func (b *Builder) buildIndex() string {

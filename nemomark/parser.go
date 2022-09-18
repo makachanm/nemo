@@ -60,8 +60,16 @@ func (l *Lexer) Tokenize(input string, tokenmap map[string]Token) []Block {
 					iidx++
 				}
 
-				Blocks = addBlock(&Blocks, TokenString, input[(pointer+1):iidx])
-				pointer = (iidx - pointer) + pointer + 1
+				if len(Blocks) > 2 && Blocks[len(Blocks)-1].token == TokenString {
+					previtem := Blocks[len(Blocks)-1].item
+					curitem := input[(pointer + 1):iidx]
+
+					Blocks[len(Blocks)-1].item = previtem + curitem
+					pointer = (iidx - pointer) + pointer + 1
+				} else {
+					Blocks = addBlock(&Blocks, TokenString, input[(pointer+1):iidx])
+					pointer = (iidx - pointer) + pointer + 1
+				}
 
 			} else {
 				//Tokenize current string.

@@ -8,5 +8,5 @@ import (
 func main() {
 	app := cli.MakeCli()
 	app.Handle(os.Args)
-	//os.Args
 }
+

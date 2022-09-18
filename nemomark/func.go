@@ -11,12 +11,14 @@ var MarkdownHandlers = map[string]func(MarkdownFucntion) string{
 	"underline": underline,
 	"link":      link,
 	"image":     image,
+	"code":      code,
 }
 
 func RenderPlain(input []string) string {
 	str := strings.Join(input, "")
-	cstr := strings.ReplaceAll(str, "\n", "<br />")
-	return cstr
+	str = strings.ReplaceAll(str, "\n", "<br />")
+
+	return str
 }
 
 func bold(input MarkdownFucntion) string {
@@ -61,4 +63,11 @@ func image(input MarkdownFucntion) string {
 	imgtag := `<img src="` + src + `" class="content-image" alt="` + altstr + `">`
 
 	return `<a href="` + src + `">` + imgtag + `</a>`
+}
+
+func code(input MarkdownFucntion) string {
+	str := strings.Join(input.Context, "")
+	str = strings.ReplaceAll(str, "\n", "<br />")
+
+	return "<code>" + str + "</code>"
 }

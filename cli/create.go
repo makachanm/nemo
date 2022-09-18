@@ -1,14 +1,13 @@
 package cli
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"nemo/build"
 	"os"
 )
 
-const StartMessage = `==--------------==
+const StartMessage = `==----------==
 New workspace is created.
 Before you start, You must install skin to /skin directory.
 Read guide about setting up skin for your workspace.`
@@ -24,19 +23,17 @@ func createNewSpace() {
 		return
 	}
 
-	red := bufio.NewReader(os.Stdin)
-
 	fmt.Println("? Name:")
-	bname, _ := red.ReadString('\n')
+	bname := Prompt(true)
 
 	fmt.Println("? Author:")
-	bauthor, _ := red.ReadString('\n')
+	bauthor := Prompt(false)
 
 	fmt.Println("? Language:")
-	blang, _ := red.ReadString('\n')
+	blang := Prompt(false)
 
 	fmt.Println("? Repository (optional, need for publish):")
-	brepo, _ := red.ReadString('\n')
+	brepo := Prompt(false)
 
 	os.Mkdir("post", os.ModePerm)
 	os.Mkdir("skin", os.ModePerm)
