@@ -17,10 +17,10 @@ func GeneratePost() {
 	min := strconv.Itoa(time.Now().Minute())
 
 	timest := fmt.Sprintf("year=%v,month=%v,day=%v,hour=%v,min=%v", year, month, day, hour, min)
-	filename := fmt.Sprintf("%v%v%v%v%v", year, month, day, hour, min)
+	bobTheBuilder := fmt.Sprintf("%v%v%v%v%v", year, month, day, hour, min)
 
 	postctx := "$[title Title]\n$[summary Summary of Post]\n$[timestamp(" + timest + ")]\n==========\n"
 
-	dir := wd + "/post/" + filename + ".ps"
+	dir := wd + "/post/" + bobTheBuilder + ".ps"
 	os.WriteFile(dir, []byte(postctx), 0777)
 }
