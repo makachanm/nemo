@@ -14,11 +14,9 @@ Read guide about setting up skin for your workspace.`
 
 func createNewSpace() {
 	wd, _ := os.Getwd()
-	_, postexist := os.Stat("post")
-	_, skinexist := os.Stat("skin")
 	_, maniexist := os.Stat("manifest.json")
 
-	if !(os.IsNotExist(postexist) && os.IsNotExist(skinexist) && os.IsNotExist(maniexist)) {
+	if !os.IsNotExist(maniexist) {
 		fmt.Println("workspace is already exist")
 		return
 	}
@@ -55,7 +53,11 @@ func createNewSpace() {
 		panic(ferr)
 	}
 
-	os.WriteFile((wd + "/post/about.ps"), []byte("Write about message here."), 0777)
+	ferr = os.WriteFile((wd + "/post/about.ps"), []byte("Write about message here."), 0777)
+	if ferr != nil {
+		panic(ferr)
+	}
+
 	os.Chdir("post")
 	os.Mkdir("res", os.ModePerm)
 

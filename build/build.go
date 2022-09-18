@@ -18,6 +18,7 @@ type Builder struct {
 	Manifest Manifest
 	Skin     Skin
 	PostList []DocumentMeta
+	wd       string
 }
 
 func MakeNewBuilder() Builder {
@@ -81,7 +82,7 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	return writer.String(), document.Meta, true
 }
 
-func (b *Builder) buildIndex() string {
+func (b *Builder) buildIndex(indexnum int) {
 	indexs := NewIndexData()
 	indexs.Indexs = b.PostList
 
@@ -116,14 +117,15 @@ func (b *Builder) buildIndex() string {
 	var writer bytes.Buffer
 	_ = t.Execute(&writer, indexs)
 
-	return writer.String()
+	indexpath := b.wd + "/dist/index.html"
+
+	_ = os.WriteFile(indexpath, writer.Bytes(), 0777)
 }
 
-func (b *Builder) buildAboutPage() string {
-	wd, _ := os.Getwd()
+func (b *Builder) buildAboutPage() {
 	markup := nemomark.MakeNemomark()
 
-	ctx, perr := os.ReadFile(wd + "/post/about.ps")
+	ctx, perr := os.ReadFile(b.wd + "/post/about.ps")
 
 	if perr != nil {
 		panic(perr)
@@ -168,7 +170,8 @@ func (b *Builder) buildAboutPage() string {
 	var writer bytes.Buffer
 	_ = t.Execute(&writer, document)
 
-	return writer.String()
+	aboutPath := b.wd + "/dist/about.html"
+	os.WriteFile(aboutPath, writer.Bytes(), 0777)
 
 }
 
@@ -232,7 +235,8 @@ func (b *Builder) Build() {
 	b.Skin.GetSkin()
 
 	wd, derr := os.Getwd()
-	workd := wd + "/post/"
+	b.wd = wd
+	workd := b.wd + "/post/"
 
 	if derr != nil {
 		panic(derr)
@@ -270,7 +274,7 @@ func (b *Builder) Build() {
 		}
 
 		name := makeFileName(dmeta.Title, dmeta.Timestamp)
-		fdir := wd + "/dist/page/" + name
+		fdir := b.wd + "/dist/page/" + name
 
 		fmt.Println(" => ", name)
 
@@ -284,16 +288,11 @@ func (b *Builder) Build() {
 		return b.PostList[i].Timestamp.StampSize() < b.PostList[j].Timestamp.StampSize()
 	})
 
-	indext := b.buildIndex()
-	indexpath := wd + "/dist/index.html"
+	b.buildIndex(0)
 
-	_ = os.WriteFile(indexpath, []byte(indext), 0777)
-
-	_, ex := os.Stat(wd + "/post/about.ps")
+	_, ex := os.Stat(b.wd + "/post/about.ps")
 	if !os.IsNotExist(ex) {
-		aboutCtx := b.buildAboutPage()
-		aboutPath := wd + "/dist/about.html"
-		_ = os.WriteFile(aboutPath, []byte(aboutCtx), 0777)
+		b.buildAboutPage()
 	}
 
 	b.packRes()
