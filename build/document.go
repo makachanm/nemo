@@ -42,7 +42,6 @@ type Header struct {
 type Footer struct {
 	IsNotIndex bool
 	Footer     string
-	VInfo      string
 }
 
 type Nav struct {
@@ -52,10 +51,12 @@ type Nav struct {
 }
 
 type IndexPage struct {
-	Indexs []DocumentMeta
-	Head   Header
-	Foot   Footer
-	Nav    Nav
+	Indexs   []DocumentMeta
+	Head     Header
+	Foot     Footer
+	Nav      Nav
+	NextPage string
+	PrevPage string
 }
 
 type AboutPage struct {

@@ -15,10 +15,11 @@ import (
 const Spliter = "==========\n"
 
 type Builder struct {
-	Manifest Manifest
-	Skin     Skin
-	PostList []DocumentMeta
-	wd       string
+	Manifest     Manifest
+	Skin         Skin
+	PostList     []DocumentMeta
+	IndexPageNum int
+	wd           string
 }
 
 func MakeNewBuilder() Builder {
@@ -54,8 +55,7 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	head := BuildHeader(b.Skin, headd)
 	document.Head = head
 
-	vinfo := "Skin with - " + b.Skin.Info.Name + " / Made by - " + b.Skin.Info.Author + " / " + b.Skin.Info.Summary
-	footd := Footer{IsNotIndex: true, VInfo: vinfo}
+	footd := Footer{IsNotIndex: true}
 	foot := BuildFooter(b.Skin, footd)
 	document.Foot = foot
 
@@ -82,9 +82,58 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	return writer.String(), document.Meta, true
 }
 
-func (b *Builder) buildIndex(indexnum int) {
+func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
+	var plist []DocumentMeta
+	var iname string
+	var prevurl, nexturl string
+
+	if len(b.PostList) <= indexnum && isFirstIndexBuild {
+		plist = append(plist, b.PostList...)
+		b.PostList = nil
+		iname = "index.html"
+		prevurl = "./index.html"
+		nexturl = "./index.html"
+
+	} else if b.IndexPageNum == 0 {
+		plist = append(plist, b.PostList[:indexnum]...)
+		b.PostList = b.PostList[indexnum:]
+
+		iname = "index.html"
+		b.IndexPageNum++
+		prevurl = ""
+		nexturl = fmt.Sprintf("./index-%v.html", b.IndexPageNum)
+
+	} else if len(b.PostList) <= indexnum && !(isFirstIndexBuild) {
+		plist = append(plist, b.PostList...)
+		b.PostList = nil
+
+		iname = fmt.Sprintf("index-%v.html", b.IndexPageNum)
+		b.IndexPageNum++
+		if b.IndexPageNum > 2 {
+			prevurl = "./index.html"
+		} else {
+			prevurl = fmt.Sprintf("./index-%v.html", (b.IndexPageNum - 1))
+		}
+		fmt.Println("iname", iname)
+		nexturl = "./" + iname
+	} else {
+		plist = append(plist, b.PostList[:indexnum]...)
+		b.PostList = b.PostList[indexnum:]
+
+		iname = fmt.Sprintf("index-%v.html", b.IndexPageNum)
+		b.IndexPageNum++
+		if b.IndexPageNum > 2 {
+			prevurl = "./index.html"
+		} else {
+			prevurl = fmt.Sprintf("./index-%v.html", (b.IndexPageNum - 1))
+		}
+		nexturl = fmt.Sprintf("./index-%v.html", b.IndexPageNum)
+	}
+
 	indexs := NewIndexData()
-	indexs.Indexs = b.PostList
+	indexs.Indexs = plist
+	indexs.PrevPage = prevurl
+	indexs.NextPage = nexturl
 
 	bname := b.Manifest.Name
 
@@ -92,8 +141,7 @@ func (b *Builder) buildIndex(indexnum int) {
 	head := BuildHeader(b.Skin, headd)
 	indexs.Head = head
 
-	vinfo := "Skin with - " + b.Skin.Info.Name + " / Made by - " + b.Skin.Info.Author + " / " + b.Skin.Info.Summary
-	footd := Footer{IsNotIndex: false, VInfo: vinfo}
+	footd := Footer{IsNotIndex: false}
 	foot := BuildFooter(b.Skin, footd)
 	indexs.Foot = foot
 
@@ -117,9 +165,10 @@ func (b *Builder) buildIndex(indexnum int) {
 	var writer bytes.Buffer
 	_ = t.Execute(&writer, indexs)
 
-	indexpath := b.wd + "/dist/index.html"
+	indexpath := b.wd + "/dist/" + iname
 
 	_ = os.WriteFile(indexpath, writer.Bytes(), 0777)
+
 }
 
 func (b *Builder) buildAboutPage() {
@@ -143,8 +192,7 @@ func (b *Builder) buildAboutPage() {
 	head := BuildHeader(b.Skin, headd)
 	document.Head = head
 
-	vinfo := "Skin with - " + b.Skin.Info.Name + " / Made by - " + b.Skin.Info.Author + " / " + b.Skin.Info.Summary
-	footd := Footer{IsNotIndex: false, VInfo: vinfo}
+	footd := Footer{IsNotIndex: false}
 	foot := BuildFooter(b.Skin, footd)
 	document.Foot = foot
 
@@ -288,7 +336,11 @@ func (b *Builder) Build() {
 		return b.PostList[i].Timestamp.StampSize() < b.PostList[j].Timestamp.StampSize()
 	})
 
-	b.buildIndex(0)
+	isFirst := true
+	for !(len(b.PostList) == 0) {
+		b.buildIndex(b.Skin.Info.Conf.IndexNum, isFirst)
+		isFirst = false
+	}
 
 	_, ex := os.Stat(b.wd + "/post/about.ps")
 	if !os.IsNotExist(ex) {

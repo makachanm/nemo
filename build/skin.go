@@ -16,12 +16,17 @@ type SkinPath struct {
 	Nav    string `json:"nav"`
 }
 
+type SkinConfig struct {
+	IndexNum int `json:"indexnum"`
+}
+
 type SkinInfo struct {
-	Name    string   `json:"name"`
-	Author  string   `json:"author"`
-	Version string   `json:"version"`
-	Summary string   `json:"summary"`
-	Paths   SkinPath `json:"paths"`
+	Name    string     `json:"name"`
+	Author  string     `json:"author"`
+	Version string     `json:"version"`
+	Summary string     `json:"summary"`
+	Conf    SkinConfig `json:"config"`
+	Paths   SkinPath   `json:"paths"`
 }
 
 type Skin struct {
