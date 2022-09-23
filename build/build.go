@@ -91,8 +91,8 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 		plist = append(plist, b.PostList...)
 		b.PostList = nil
 		iname = "index.html"
-		prevurl = "./index.html"
-		nexturl = "./index.html"
+		prevurl = ""
+		nexturl = ""
 
 	} else if b.IndexPageNum == 0 {
 		plist = append(plist, b.PostList[:indexnum]...)
@@ -114,8 +114,8 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 		} else {
 			prevurl = fmt.Sprintf("./index-%v.html", (b.IndexPageNum - 1))
 		}
-		fmt.Println("iname", iname)
-		nexturl = "./" + iname
+
+		nexturl = ""
 	} else {
 		plist = append(plist, b.PostList[:indexnum]...)
 		b.PostList = b.PostList[indexnum:]
