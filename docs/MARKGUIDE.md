@@ -41,7 +41,7 @@ func foo(bar string[]) string {
 > }
 ```
 
-## Functions 
+# Functions 
 
 #### Bold
 ``` $[bold Text] ```
