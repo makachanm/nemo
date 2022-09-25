@@ -15,9 +15,9 @@ $[bold Hello] New World!
 
 When text is contain Nemomark's function syntax string, Nemomark cannot do a corect display of text.
 
-To solve problem like this, you can use "Ignore" syntax.
+To solve problem, you can use "Ignore" syntax.
 ``` 
-This is string that contains dollar sign`$` and square brackets`[]`
+This is string contains dollar sign`$` and square brackets`[]`
 
 > This is string that contains dollar sign$ and square brackets[]
 ```
