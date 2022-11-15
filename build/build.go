@@ -18,13 +18,14 @@ type Builder struct {
 	Manifest     Manifest
 	Skin         Skin
 	PostList     []DocumentMeta
+	TagList      map[string][]DocumentMeta
 	IndexPageNum int
 	wd           string
 }
 
 func MakeNewBuilder() Builder {
 	mfest := GetManifest()
-	return Builder{Skin: MakeSkin(), Manifest: mfest}
+	return Builder{Skin: MakeSkin(), Manifest: mfest, TagList: make(map[string][]DocumentMeta)}
 }
 
 func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
@@ -166,6 +167,47 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 	_ = t.Execute(&writer, indexs)
 
 	indexpath := b.wd + "/dist/" + iname
+
+	_ = os.WriteFile(indexpath, writer.Bytes(), 0777)
+
+}
+
+func (b *Builder) buildTagsPage() {
+
+	tags := NewTagsData()
+	tags.Tags = b.TagList
+
+	bname := b.Manifest.Name
+
+	headd := Header{IsNotIndex: false, BlogName: bname}
+	head := BuildHeader(b.Skin, headd)
+	tags.Head = head
+
+	footd := Footer{IsNotIndex: false}
+	foot := BuildFooter(b.Skin, footd)
+	tags.Foot = foot
+
+	navd := Nav{IsNotIndex: false, BlogName: bname}
+	nav := BuildNav(b.Skin, navd)
+	tags.Nav = nav
+
+	file, fserr := os.ReadFile(b.Skin.Info.Paths.Tags)
+
+	if fserr != nil {
+		panic(fserr)
+	}
+
+	var builder template.Template
+	t, err := builder.Parse(string(file))
+
+	if err != nil {
+		panic(err)
+	}
+
+	var writer bytes.Buffer
+	_ = t.Execute(&writer, tags)
+
+	indexpath := b.wd + "/dist/tags.html"
 
 	_ = os.WriteFile(indexpath, writer.Bytes(), 0777)
 
@@ -330,7 +372,12 @@ func (b *Builder) Build() {
 
 		dmeta.Path = name
 		b.PostList = append(b.PostList, dmeta)
+		if dmeta.Tags != "" {
+			b.TagList[dmeta.Tags] = append(b.TagList[dmeta.Tags], dmeta)
+		}
 	}
+
+	fmt.Println("TGL :", b.TagList)
 
 	sort.Slice(b.PostList, func(i, j int) bool {
 		return b.PostList[i].Timestamp.StampSize() < b.PostList[j].Timestamp.StampSize()
@@ -346,6 +393,8 @@ func (b *Builder) Build() {
 	if !os.IsNotExist(ex) {
 		b.buildAboutPage()
 	}
+
+	//b.buildTagsPage()
 
 	b.packRes()
 }

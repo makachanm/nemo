@@ -8,19 +8,26 @@ import (
 )
 
 func Prompt(mustfilled bool) string {
+	var result string
+	var ioerr error
 	red := bufio.NewReader(os.Stdin)
-	result, err := red.ReadString('\n')
 
-	if err != nil {
-		panic(err)
+	for {
+		result, ioerr = red.ReadString('\n')
+
+		if ioerr != nil {
+			panic(ioerr)
+		}
+
+		if result == "\n" && mustfilled {
+			fmt.Println("required field")
+			continue
+		}
+
+		result = strings.ReplaceAll(result, "\n", "")
+		break
+
 	}
-
-	if result == "\n" && mustfilled {
-		fmt.Println("required feild")
-		return Prompt(mustfilled)
-	}
-
-	result = strings.ReplaceAll(result, "\n", "")
 
 	return result
 }

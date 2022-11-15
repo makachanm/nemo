@@ -14,6 +14,7 @@ type SkinPath struct {
 	Header string `json:"header"`
 	Footer string `json:"footer"`
 	Nav    string `json:"nav"`
+	Tags   string `json:"tags"`
 }
 
 type SkinConfig struct {
@@ -23,7 +24,6 @@ type SkinConfig struct {
 type SkinInfo struct {
 	Name    string     `json:"name"`
 	Author  string     `json:"author"`
-	Version string     `json:"version"`
 	Summary string     `json:"summary"`
 	Conf    SkinConfig `json:"config"`
 	Paths   SkinPath   `json:"paths"`

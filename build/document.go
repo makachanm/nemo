@@ -22,6 +22,7 @@ type DocumentMeta struct {
 	Timestamp TimeStamp
 	Summary   string
 	Path      string
+	Tags      string
 }
 
 type Document struct {
@@ -68,6 +69,13 @@ type AboutPage struct {
 	BuildInfo string
 }
 
+type TagsPage struct {
+	Tags map[string][]DocumentMeta
+	Head Header
+	Foot Footer
+	Nav  Nav
+}
+
 func MakeMetaData() DocumentMeta {
 	return DocumentMeta{}
 }
@@ -82,6 +90,10 @@ func NewIndexData() IndexPage {
 
 func NewAboutPage() AboutPage {
 	return AboutPage{}
+}
+
+func NewTagsData() TagsPage {
+	return TagsPage{}
 }
 
 func MakeTimeStamp(year int, month int, day int, hour int, min int) TimeStamp {
@@ -110,10 +122,22 @@ func (d *Document) ParseMeta(input string) {
 	for _, ctx := range parseResult.Child {
 		switch ctx.FuncContext.FucntionName {
 		case "title":
-			metadata.Title = ctx.FuncContext.Context[0]
+			tags_data := ctx.FuncContext.Context[0]
+			if len(tags_data) <= 0 || tags_data == "" {
+				metadata.Title = ""
+				break
+			}
+
+			metadata.Title = tags_data
 
 		case "summary":
-			metadata.Summary = ctx.FuncContext.Context[0]
+			tags_data := ctx.FuncContext.Context[0]
+			if len(tags_data) <= 0 || tags_data == "" {
+				metadata.Summary = ""
+				break
+			}
+
+			metadata.Summary = tags_data
 
 		case "timestamp":
 			year, yerr := strconv.Atoi(ctx.FuncContext.Args["year"])
@@ -139,6 +163,15 @@ func (d *Document) ParseMeta(input string) {
 
 			stamp := MakeTimeStamp(year, month, date, hour, min)
 			metadata.Timestamp = stamp
+
+		case "tag":
+			tags_data := ctx.FuncContext.Context[0]
+			if len(tags_data) <= 0 || tags_data == "" {
+				metadata.Tags = ""
+				break
+			}
+
+			metadata.Tags = tags_data
 		}
 	}
 
