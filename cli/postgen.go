@@ -20,10 +20,10 @@ func GeneratePost() {
 	bobTheBuilder := fmt.Sprintf("%v%v%v%v%v", year, month, day, hour, min)
 
 	postctx := `$[title Title]
-	$[summary Summary of Post]
-	$[timestamp(` + timest + `)]
-	$[tag Tags]
-	==========
+$[summary Summary of Post]
+$[timestamp(` + timest + `)]
+$[tag Tags]
+==========
 	`
 
 	dir := wd + "/post/" + bobTheBuilder + ".ps"

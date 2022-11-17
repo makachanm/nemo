@@ -173,7 +173,7 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 }
 
 func (b *Builder) buildTagsPage() {
-
+   fmt.Println("Tag Page Building...");
 	tags := NewTagsData()
 	tags.Tags = b.TagList
 
@@ -182,7 +182,7 @@ func (b *Builder) buildTagsPage() {
 	headd := Header{IsNotIndex: false, BlogName: bname}
 	head := BuildHeader(b.Skin, headd)
 	tags.Head = head
-
+   
 	footd := Footer{IsNotIndex: false}
 	foot := BuildFooter(b.Skin, footd)
 	tags.Foot = foot
@@ -394,7 +394,7 @@ func (b *Builder) Build() {
 		b.buildAboutPage()
 	}
 
-	//b.buildTagsPage()
+	b.buildTagsPage()
 
 	b.packRes()
 }
