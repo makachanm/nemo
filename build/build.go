@@ -173,7 +173,7 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 }
 
 func (b *Builder) buildTagsPage() {
-   fmt.Println("Tag Page Building...");
+	fmt.Println("Tag Page Building...")
 	tags := NewTagsData()
 	tags.Tags = b.TagList
 
@@ -182,7 +182,7 @@ func (b *Builder) buildTagsPage() {
 	headd := Header{IsNotIndex: false, BlogName: bname}
 	head := BuildHeader(b.Skin, headd)
 	tags.Head = head
-   
+
 	footd := Footer{IsNotIndex: false}
 	foot := BuildFooter(b.Skin, footd)
 	tags.Foot = foot
@@ -377,10 +377,14 @@ func (b *Builder) Build() {
 		}
 	}
 
-	fmt.Println("TGL :", b.TagList)
+	//fmt.Println("TGL :", b.TagList)
 
 	sort.Slice(b.PostList, func(i, j int) bool {
-		return b.PostList[i].Timestamp.StampSize() < b.PostList[j].Timestamp.StampSize()
+		tsp := TimeStamp{}
+		fmt.Println(b.PostList[i].Title, b.PostList[j].Title, tsp.isBigeerStamp(b.PostList[i].Timestamp, b.PostList[j].Timestamp))
+
+		return !tsp.isBigeerStamp(b.PostList[i].Timestamp, b.PostList[j].Timestamp)
+		//return b.PostList[i].Timestamp.StampSize() < b.PostList[j].Timestamp.StampSize()
 	})
 
 	isFirst := true
