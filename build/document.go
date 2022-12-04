@@ -52,12 +52,13 @@ type Nav struct {
 }
 
 type IndexPage struct {
-	Indexs   []DocumentMeta
-	Head     Header
-	Foot     Footer
-	Nav      Nav
-	NextPage string
-	PrevPage string
+	Indexs    []DocumentMeta
+	IndexsNum int
+	Head      Header
+	Foot      Footer
+	Nav       Nav
+	NextPage  string
+	PrevPage  string
 }
 
 type AboutPage struct {
@@ -70,10 +71,11 @@ type AboutPage struct {
 }
 
 type TagsPage struct {
-	Tags map[string][]DocumentMeta
-	Head Header
-	Foot Footer
-	Nav  Nav
+	Tags    map[string][]DocumentMeta
+	TagsNum int
+	Head    Header
+	Foot    Footer
+	Nav     Nav
 }
 
 func MakeMetaData() DocumentMeta {

@@ -19,6 +19,7 @@ type Builder struct {
 	Skin         Skin
 	PostList     []DocumentMeta
 	TagList      map[string][]DocumentMeta
+	TagLengths   int
 	IndexPageNum int
 	wd           string
 }
@@ -173,9 +174,9 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 }
 
 func (b *Builder) buildTagsPage() {
-	fmt.Println("Tag Page Building...")
 	tags := NewTagsData()
 	tags.Tags = b.TagList
+	tags.TagsNum = b.TagLengths
 
 	bname := b.Manifest.Name
 
@@ -374,17 +375,26 @@ func (b *Builder) Build() {
 		b.PostList = append(b.PostList, dmeta)
 		if dmeta.Tags != "" {
 			b.TagList[dmeta.Tags] = append(b.TagList[dmeta.Tags], dmeta)
+			b.TagLengths++
 		}
+	}
+
+	for tkey, tele := range b.TagList {
+		taglist_before := tele
+
+		sort.Slice(taglist_before, func(i, j int) bool {
+			tsp := TimeStamp{}
+			return !tsp.isBigeerStamp(taglist_before[i].Timestamp, taglist_before[j].Timestamp)
+		})
+
+		b.TagList[tkey] = taglist_before
 	}
 
 	//fmt.Println("TGL :", b.TagList)
 
 	sort.Slice(b.PostList, func(i, j int) bool {
 		tsp := TimeStamp{}
-		fmt.Println(b.PostList[i].Title, b.PostList[j].Title, tsp.isBigeerStamp(b.PostList[i].Timestamp, b.PostList[j].Timestamp))
-
 		return !tsp.isBigeerStamp(b.PostList[i].Timestamp, b.PostList[j].Timestamp)
-		//return b.PostList[i].Timestamp.StampSize() < b.PostList[j].Timestamp.StampSize()
 	})
 
 	isFirst := true
