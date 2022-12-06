@@ -62,12 +62,13 @@ type IndexPage struct {
 }
 
 type AboutPage struct {
-	Meta      DocumentMeta
-	Head      Header
-	Foot      Footer
-	Nav       Nav
-	Content   string
-	BuildInfo string
+	Meta       DocumentMeta
+	Head       Header
+	Foot       Footer
+	Nav        Nav
+	Content    string
+	BuildInfo  string
+	AuthorInfo string
 }
 
 type TagsPage struct {

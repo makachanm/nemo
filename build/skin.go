@@ -18,7 +18,8 @@ type SkinPath struct {
 }
 
 type SkinConfig struct {
-	IndexNum int `json:"indexnum"`
+	IndexNum int    `json:"indexnum"`
+	DateType string `json:"datetype"`
 }
 
 type SkinInfo struct {

@@ -72,6 +72,16 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	}
 
 	var builder template.Template
+
+	tl := NewTemplateTools(b.Skin.Info.Conf)
+	builder.Funcs(template.FuncMap{
+		"GetTimeStamp": func(t TimeStamp) string {
+			return tl.GetTimeStamp(t)
+		},
+		"GetTagnameHash": func(n string) string {
+			return tl.GetTagnameHash(n)
+		},
+	})
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
@@ -158,6 +168,16 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 	}
 
 	var builder template.Template
+	tl := NewTemplateTools(b.Skin.Info.Conf)
+	builder.Funcs(template.FuncMap{
+		"GetTimeStamp": func(t TimeStamp) string {
+			return tl.GetTimeStamp(t)
+		},
+		"GetTagnameHash": func(n string) string {
+			return tl.GetTagnameHash(n)
+		},
+	})
+
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
@@ -199,6 +219,16 @@ func (b *Builder) buildTagsPage() {
 	}
 
 	var builder template.Template
+	tl := NewTemplateTools(b.Skin.Info.Conf)
+	builder.Funcs(template.FuncMap{
+		"GetTimeStamp": func(t TimeStamp) string {
+			return tl.GetTimeStamp(t)
+		},
+		"GetTagnameHash": func(n string) string {
+			return tl.GetTagnameHash(n)
+		},
+	})
+
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
@@ -244,6 +274,7 @@ func (b *Builder) buildAboutPage() {
 	document.Nav = nav
 
 	document.BuildInfo = "" //WIP
+	document.AuthorInfo = b.Manifest.Author
 
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.About)
 
@@ -252,6 +283,7 @@ func (b *Builder) buildAboutPage() {
 	}
 
 	var builder template.Template
+
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
