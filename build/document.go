@@ -113,7 +113,7 @@ func (t *TimeStamp) StampSize() int {
 	return t.Year + t.Month + t.Day + t.Hour + t.Min
 }
 
-func (t *TimeStamp) isBigeerStamp(src TimeStamp, cmp TimeStamp) bool {
+func (t *TimeStamp) isBiggerStamp(src TimeStamp, cmp TimeStamp) bool {
 	if (src.Year >= cmp.Year) && (src.Month >= cmp.Month) && (src.Hour >= cmp.Hour) {
 		if !(src.Day >= cmp.Day) {
 			return false

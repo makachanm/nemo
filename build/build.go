@@ -475,7 +475,7 @@ func (b *Builder) Build() {
 
 		sort.Slice(taglistBefore, func(i, j int) bool {
 			tsp := TimeStamp{}
-			return !tsp.isBigeerStamp(taglistBefore[i].Timestamp, taglistBefore[j].Timestamp)
+			return !tsp.isBiggerStamp(taglistBefore[i].Timestamp, taglistBefore[j].Timestamp)
 		})
 
 		b.TagList[tkey] = taglistBefore
@@ -485,7 +485,7 @@ func (b *Builder) Build() {
 
 	sort.Slice(b.PostList, func(i, j int) bool {
 		tsp := TimeStamp{}
-		return !tsp.isBigeerStamp(b.PostList[i].Timestamp, b.PostList[j].Timestamp)
+		return !tsp.isBiggerStamp(b.PostList[i].Timestamp, b.PostList[j].Timestamp)
 	})
 
 	isFirst := true
