@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 func DirCopy(src string, dst string) error {
@@ -13,31 +14,48 @@ func DirCopy(src string, dst string) error {
 		return err
 	}
 
+	// Check if src and dst directories are the same
+	if src == dst {
+		return fmt.Errorf("source and destination directories are the same")
+	}
+
 	// Create destination dir
 	err = os.MkdirAll(dst, srcInfo.Mode())
 	if err != nil {
 		return err
 	}
 
-	directory, _ := os.Open(src)
+	directory, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer func(directory *os.File) {
+		err := directory.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}(directory)
+
 	objects, err := directory.Readdir(-1)
+	if err != nil {
+		return err
+	}
 
 	for _, obj := range objects {
-
-		srcPointer := src + "/" + obj.Name()
-		dstPointer := dst + "/" + obj.Name()
+		srcPointer := src + string(filepath.Separator) + obj.Name()
+		dstPointer := dst + string(filepath.Separator) + obj.Name()
 
 		if obj.IsDir() {
 			// Create sub-directories - recursively
 			err = DirCopy(srcPointer, dstPointer)
 			if err != nil {
-				fmt.Println(err)
+				return err
 			}
 		} else {
 			// Perform copy
 			err = FileCopy(srcPointer, dstPointer)
 			if err != nil {
-				fmt.Println(err)
+				return err
 			}
 		}
 
@@ -62,7 +80,7 @@ func FileCopy(src string, dst string) error {
 	defer func(source *os.File) {
 		err := source.Close()
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 	}(source)
 
@@ -73,9 +91,11 @@ func FileCopy(src string, dst string) error {
 	defer func(destination *os.File) {
 		err := destination.Close()
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
 		}
 	}(destination)
-	_, err = io.Copy(destination, source)
+
+	buf := make([]byte, 32*1024)
+	_, err = io.CopyBuffer(destination, source, buf)
 	return err
 }
