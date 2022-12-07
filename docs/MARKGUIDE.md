@@ -61,7 +61,7 @@ func foo(bar string[]) string {
 #### Image 
 ``` $[image(url=imagesrc) Alt Text] ```
 
-If you want use your own image, 
+If you want to use your own image, 
  1. Put your image file to ``"/post/res"``.
  2. Link your image like this: 
  ``` $[image(url=./res/yourimage.png)] ```
