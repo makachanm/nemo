@@ -142,22 +142,22 @@ func (d *Document) ParseMeta(input string) {
 	for _, ctx := range parseResult.Child {
 		switch ctx.FuncContext.FucntionName {
 		case "title":
-			tags_data := ctx.FuncContext.Context[0]
-			if len(tags_data) <= 0 || tags_data == "" {
+			tagsData := ctx.FuncContext.Context[0]
+			if len(tagsData) <= 0 || tagsData == "" {
 				metadata.Title = ""
 				break
 			}
 
-			metadata.Title = tags_data
+			metadata.Title = tagsData
 
 		case "summary":
-			tags_data := ctx.FuncContext.Context[0]
-			if len(tags_data) <= 0 || tags_data == "" {
+			tagsData := ctx.FuncContext.Context[0]
+			if len(tagsData) <= 0 || tagsData == "" {
 				metadata.Summary = ""
 				break
 			}
 
-			metadata.Summary = tags_data
+			metadata.Summary = tagsData
 
 		case "timestamp":
 			year, yerr := strconv.Atoi(ctx.FuncContext.Args["year"])
@@ -185,24 +185,24 @@ func (d *Document) ParseMeta(input string) {
 			metadata.Timestamp = stamp
 
 		case "tag":
-			tags_data := ctx.FuncContext.Context[0]
-			if len(tags_data) <= 0 || tags_data == "" {
+			tagsData := ctx.FuncContext.Context[0]
+			if len(tagsData) <= 0 || tagsData == "" {
 				metadata.Tags = ""
 				break
 			}
 
-			metadata.Tags = tags_data
+			metadata.Tags = tagsData
 		}
 	}
 
 	d.Meta = metadata
 }
 
-func BuildHeader(skin Skin, Ctx interface{}) Header {
+func BuildHeader(skin Skin, Ctx interface{}) (Header, error) {
 	t, err := template.ParseFiles(skin.Info.Paths.Header)
 
 	if err != nil {
-		panic(err)
+		return Header{}, err
 	}
 
 	var writer bytes.Buffer
@@ -211,14 +211,14 @@ func BuildHeader(skin Skin, Ctx interface{}) Header {
 	var head Header
 	head.Header = writer.String()
 
-	return head
+	return head, nil
 }
 
-func BuildFooter(skin Skin, Ctx interface{}) Footer {
+func BuildFooter(skin Skin, Ctx interface{}) (Footer, error) {
 	t, err := template.ParseFiles(skin.Info.Paths.Footer)
 
 	if err != nil {
-		panic(err)
+		return Footer{}, err
 	}
 
 	var writer bytes.Buffer
@@ -227,14 +227,14 @@ func BuildFooter(skin Skin, Ctx interface{}) Footer {
 	var foot Footer
 	foot.Footer = writer.String()
 
-	return foot
+	return foot, nil
 }
 
-func BuildNav(skin Skin, Ctx interface{}) Nav {
+func BuildNav(skin Skin, Ctx interface{}) (Nav, error) {
 	t, err := template.ParseFiles(skin.Info.Paths.Nav)
 
 	if err != nil {
-		panic(err)
+		return Nav{}, err
 	}
 
 	var writer bytes.Buffer
@@ -243,5 +243,5 @@ func BuildNav(skin Skin, Ctx interface{}) Nav {
 	var nav Nav
 	nav.Navbar = writer.String()
 
-	return nav
+	return nav, nil
 }

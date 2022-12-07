@@ -5,18 +5,34 @@ import (
 	"nemo/build"
 )
 
+const (
+	BuildCommand   = "build"
+	NewPostCommand = "newpost"
+	CreateCommand  = "create"
+)
+
 type Interface struct {
-	Usage string
+	Usage      string
+	commandMap map[string]func()
 }
 
 func MakeCli() Interface {
-	return Interface{
-		Usage: "Usage: nemo <command>\n\n" +
-			"Commands:\n" +
-			"  build       Build the site\n" +
-			"  newpost     Create a new post\n" +
-			"  create      Create a new space\n",
+	ci := Interface{
+		Usage: `Usage: nemo <command>
+
+Commands:
+  build       Build the site
+  newpost     Create a new post
+  create      Create a new space`,
+
+		commandMap: map[string]func(){
+			BuildCommand:   buildHandler,
+			NewPostCommand: GeneratePost,
+			CreateCommand:  createNewSpace,
+		},
 	}
+
+	return ci
 }
 
 func (ci *Interface) Handle(args []string) {
@@ -25,23 +41,22 @@ func (ci *Interface) Handle(args []string) {
 		return
 	}
 
-	switch args[1] {
-	case "build":
-		buildHandler()
+	command := args[1]
 
-	case "newpost":
-		GeneratePost()
-
-	case "create":
-		createNewSpace()
-
-	default:
-		fmt.Println("\x1b[31merror\x1b[0m: unknown command")
-		fmt.Println("\n", ci.Usage)
+	handler, ok := ci.commandMap[command]
+	if !ok {
+		fmt.Printf("\x1b[31merror\x1b[0m: unknown command '%s'\n\n", command)
+		fmt.Println(ci.Usage)
+		return
 	}
+
+	handler()
 }
 
 func buildHandler() {
-	b := build.MakeNewBuilder()
+	var b build.Builder
+
+	build.MakeNewBuilder(&b)
+
 	b.Build()
 }

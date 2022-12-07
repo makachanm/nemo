@@ -2,7 +2,7 @@ package build
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"os"
 	"reflect"
 )
@@ -38,30 +38,29 @@ func MakeSkin() Skin {
 	return Skin{}
 }
 
-func (s *Skin) GetSkin() {
+func (s *Skin) GetSkin() error {
 	skinpath, perr := os.Getwd()
 
 	if perr != nil {
-		panic(perr)
+		return perr
 	}
 
 	_, skinexist := os.Stat(skinpath + "/skin/skin.json")
 	if os.IsNotExist(skinexist) {
-		fmt.Println("Skin is not exist")
-		os.Exit(1)
+		return errors.New("skin is not exist")
 	}
 
 	ctx, ferr := os.ReadFile(skinpath + "/skin/skin.json")
 
 	if ferr != nil {
-		panic(ferr)
+		return ferr
 	}
 
 	var sinfo = SkinInfo{}
 	jerr := json.Unmarshal(ctx, &sinfo)
 
 	if jerr != nil {
-		panic(jerr)
+		return jerr
 	}
 
 	s.Info = sinfo
@@ -82,4 +81,5 @@ func (s *Skin) GetSkin() {
 
 	s.Info.Paths = infos.Paths
 
+	return nil
 }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"log"
 	"nemo/nemomark"
 	"os"
 	"sort"
@@ -24,9 +25,15 @@ type Builder struct {
 	wd           string
 }
 
-func MakeNewBuilder() Builder {
-	mfest := GetManifest()
-	return Builder{Skin: MakeSkin(), Manifest: mfest, TagList: make(map[string][]DocumentMeta)}
+func MakeNewBuilder(b *Builder) {
+	mfest, err := GetManifest()
+	if err != nil {
+		return
+	}
+
+	b.Skin = MakeSkin()
+	b.Manifest = mfest
+	b.TagList = make(map[string][]DocumentMeta)
 }
 
 func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
@@ -35,7 +42,7 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	ctx, perr := os.ReadFile(postpath)
 
 	if perr != nil {
-		panic(perr)
+		fmt.Println("Error reading file:", perr)
 	}
 
 	postRawctx := string(ctx)
@@ -54,21 +61,30 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	bname := b.Manifest.Name
 
 	headd := Header{IsNotIndex: true, BlogName: bname, PostName: document.Meta.Title}
-	head := BuildHeader(b.Skin, headd)
+	head, err := BuildHeader(b.Skin, headd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	document.Head = head
 
 	footd := Footer{IsNotIndex: true}
-	foot := BuildFooter(b.Skin, footd)
+	foot, err := BuildFooter(b.Skin, footd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	document.Foot = foot
 
 	navd := Nav{IsNotIndex: true, BlogName: bname}
-	nav := BuildNav(b.Skin, navd)
+	nav, err := BuildNav(b.Skin, navd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	document.Nav = nav
 
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.Post)
 
 	if fserr != nil {
-		panic(fserr)
+		fmt.Println("Error reading file:", fserr)
 	}
 
 	var builder template.Template
@@ -85,7 +101,8 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Error parsing file:", err)
+		return "", document.Meta, false
 	}
 
 	var writer bytes.Buffer
@@ -124,7 +141,7 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 		if b.IndexPageNum > 2 {
 			prevurl = "./index.html"
 		} else {
-			prevurl = fmt.Sprintf("./index-%v.html", (b.IndexPageNum - 1))
+			prevurl = fmt.Sprintf("./index-%v.html", b.IndexPageNum-1)
 		}
 
 		nexturl = ""
@@ -137,7 +154,7 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 		if b.IndexPageNum > 2 {
 			prevurl = "./index.html"
 		} else {
-			prevurl = fmt.Sprintf("./index-%v.html", (b.IndexPageNum - 1))
+			prevurl = fmt.Sprintf("./index-%v.html", b.IndexPageNum-1)
 		}
 		nexturl = fmt.Sprintf("./index-%v.html", b.IndexPageNum)
 	}
@@ -150,21 +167,31 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 	bname := b.Manifest.Name
 
 	headd := Header{IsNotIndex: false, BlogName: bname}
-	head := BuildHeader(b.Skin, headd)
+	head, err := BuildHeader(b.Skin, headd)
+
+	if err != nil {
+		fmt.Println(err)
+	}
 	indexs.Head = head
 
 	footd := Footer{IsNotIndex: false}
-	foot := BuildFooter(b.Skin, footd)
+	foot, err := BuildFooter(b.Skin, footd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	indexs.Foot = foot
 
 	navd := Nav{IsNotIndex: false, BlogName: bname}
-	nav := BuildNav(b.Skin, navd)
+	nav, err := BuildNav(b.Skin, navd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	indexs.Nav = nav
 
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.Index)
 
 	if fserr != nil {
-		panic(fserr)
+		fmt.Println("Error reading file:", fserr)
 	}
 
 	var builder template.Template
@@ -181,7 +208,7 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Error parsing file:", err)
 	}
 
 	var writer bytes.Buffer
@@ -189,7 +216,10 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 
 	indexpath := b.wd + "/dist/" + iname
 
-	_ = os.WriteFile(indexpath, writer.Bytes(), 0777)
+	err = os.WriteFile(indexpath, writer.Bytes(), 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
 
@@ -201,21 +231,29 @@ func (b *Builder) buildTagsPage() {
 	bname := b.Manifest.Name
 
 	headd := Header{IsNotIndex: false, BlogName: bname}
-	head := BuildHeader(b.Skin, headd)
+	head, err := BuildHeader(b.Skin, headd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	tags.Head = head
 
 	footd := Footer{IsNotIndex: false}
-	foot := BuildFooter(b.Skin, footd)
+	foot, err := BuildFooter(b.Skin, footd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	tags.Foot = foot
 
 	navd := Nav{IsNotIndex: false, BlogName: bname}
-	nav := BuildNav(b.Skin, navd)
+	nav, err := BuildNav(b.Skin, navd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	tags.Nav = nav
 
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.Tags)
-
 	if fserr != nil {
-		panic(fserr)
+		fmt.Println("Error reading file:", fserr)
 	}
 
 	var builder template.Template
@@ -232,7 +270,7 @@ func (b *Builder) buildTagsPage() {
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Error parsing file:", err)
 	}
 
 	var writer bytes.Buffer
@@ -240,7 +278,10 @@ func (b *Builder) buildTagsPage() {
 
 	indexpath := b.wd + "/dist/tags.html"
 
-	_ = os.WriteFile(indexpath, writer.Bytes(), 0777)
+	err = os.WriteFile(indexpath, writer.Bytes(), 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 }
 
@@ -250,7 +291,7 @@ func (b *Builder) buildAboutPage() {
 	ctx, perr := os.ReadFile(b.wd + "/post/about.ps")
 
 	if perr != nil {
-		panic(perr)
+		fmt.Println("Error reading file:", perr)
 	}
 
 	postRawctx := string(ctx)
@@ -262,15 +303,24 @@ func (b *Builder) buildAboutPage() {
 	bname := b.Manifest.Name
 
 	headd := Header{IsNotIndex: false, BlogName: bname}
-	head := BuildHeader(b.Skin, headd)
+	head, err := BuildHeader(b.Skin, headd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	document.Head = head
 
 	footd := Footer{IsNotIndex: false}
-	foot := BuildFooter(b.Skin, footd)
+	foot, err := BuildFooter(b.Skin, footd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	document.Foot = foot
 
 	navd := Nav{IsNotIndex: false, BlogName: bname}
-	nav := BuildNav(b.Skin, navd)
+	nav, err := BuildNav(b.Skin, navd)
+	if err != nil {
+		fmt.Println(err)
+	}
 	document.Nav = nav
 
 	document.BuildInfo = "" //WIP
@@ -279,7 +329,7 @@ func (b *Builder) buildAboutPage() {
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.About)
 
 	if fserr != nil {
-		panic(fserr)
+		fmt.Println("Error reading file:", fserr)
 	}
 
 	var builder template.Template
@@ -287,15 +337,18 @@ func (b *Builder) buildAboutPage() {
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Error parsing file:", err)
 	}
 
 	var writer bytes.Buffer
 	_ = t.Execute(&writer, document)
 
 	aboutPath := b.wd + "/dist/about.html"
-	os.WriteFile(aboutPath, writer.Bytes(), 0777)
 
+	err = os.WriteFile(aboutPath, writer.Bytes(), 0777)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func (b *Builder) packRes() {
@@ -322,7 +375,7 @@ func (b *Builder) packRes() {
 
 	cerr := DirCopy(skinsrc, skindet)
 	if cerr != nil {
-		panic(cerr)
+		fmt.Println("Error copying directory:", cerr)
 	}
 
 	resrc := "./post/res"
@@ -330,7 +383,7 @@ func (b *Builder) packRes() {
 
 	rerr := DirCopy(resrc, resdet)
 	if rerr != nil {
-		panic(rerr)
+		fmt.Println("Error copying directory:", rerr)
 	}
 
 }
@@ -355,20 +408,23 @@ func makeFileName(title string, smp TimeStamp) string {
 func (b *Builder) Build() {
 	b.PostList = make([]DocumentMeta, 0)
 
-	b.Skin.GetSkin()
+	err := b.Skin.GetSkin()
+	if err != nil {
+		fmt.Println("Error getting skin:", err)
+	}
 
 	wd, derr := os.Getwd()
 	b.wd = wd
 	workd := b.wd + "/post/"
 
 	if derr != nil {
-		panic(derr)
+		fmt.Println("Error getting working directory:", derr)
 	}
 
 	dir, rderr := os.ReadDir(workd)
 
 	if rderr != nil {
-		panic(rderr)
+		fmt.Println("Error reading directory:", rderr)
 	}
 
 	var BuildTargets = make([]string, 0)
@@ -401,7 +457,10 @@ func (b *Builder) Build() {
 
 		fmt.Println(" => ", name)
 
-		_ = os.WriteFile(fdir, []byte(content), 0777)
+		err := os.WriteFile(fdir, []byte(content), 0777)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		dmeta.Path = name
 		b.PostList = append(b.PostList, dmeta)
@@ -412,14 +471,14 @@ func (b *Builder) Build() {
 	}
 
 	for tkey, tele := range b.TagList {
-		taglist_before := tele
+		taglistBefore := tele
 
-		sort.Slice(taglist_before, func(i, j int) bool {
+		sort.Slice(taglistBefore, func(i, j int) bool {
 			tsp := TimeStamp{}
-			return !tsp.isBigeerStamp(taglist_before[i].Timestamp, taglist_before[j].Timestamp)
+			return !tsp.isBigeerStamp(taglistBefore[i].Timestamp, taglistBefore[j].Timestamp)
 		})
 
-		b.TagList[tkey] = taglist_before
+		b.TagList[tkey] = taglistBefore
 	}
 
 	//fmt.Println("TGL :", b.TagList)

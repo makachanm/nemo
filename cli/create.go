@@ -22,19 +22,44 @@ func createNewSpace() {
 	}
 
 	fmt.Println("? Name:")
-	bname := Prompt(true)
+	bname, err := Prompt(true)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	fmt.Println("? Author:")
-	bauthor := Prompt(false)
+	bauthor, err := Prompt(false)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	fmt.Println("? Language:")
-	blang := Prompt(false)
+	blang, err := Prompt(false)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	fmt.Println("? Repository (optional, need for publish):")
-	brepo := Prompt(false)
+	brepo, err := Prompt(false)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
-	os.Mkdir("post", os.ModePerm)
-	os.Mkdir("skin", os.ModePerm)
+	err = os.Mkdir("post", os.ModePerm)
+	if err != nil {
+		fmt.Println("Error creating post directory:", err)
+		return
+	}
+
+	err = os.Mkdir("skin", os.ModePerm)
+	if err != nil {
+		fmt.Println("Error creating skin directory:", err)
+		return
+	}
 
 	manifest := build.Manifest{
 		Name:   bname,
@@ -45,21 +70,33 @@ func createNewSpace() {
 
 	manibuild, err := json.Marshal(manifest)
 	if err != nil {
-		panic(err)
+		fmt.Println("Error marshalling manifest:", err)
+		return
 	}
 
 	ferr := os.WriteFile("manifest.json", manibuild, 0777)
 	if ferr != nil {
-		panic(ferr)
+		fmt.Println("Error writing manifest file:", ferr)
+		return
 	}
 
-	ferr = os.WriteFile((wd + "/post/about.ps"), []byte("Write about message here."), 0777)
+	ferr = os.WriteFile(wd+"/post/about.ps", []byte("Write about message here."), 0777)
 	if ferr != nil {
-		panic(ferr)
+		fmt.Println("Error writing about.ps file:", ferr)
+		return
 	}
 
-	os.Chdir("post")
-	os.Mkdir("res", os.ModePerm)
+	err = os.Chdir("post")
+	if err != nil {
+		fmt.Println("Error changing directory:", err)
+		return
+	}
+
+	err = os.Mkdir("res", os.ModePerm)
+	if err != nil {
+		fmt.Println("Error creating res directory:", err)
+		return
+	}
 
 	fmt.Println("Build Complete")
 	fmt.Println(StartMessage)

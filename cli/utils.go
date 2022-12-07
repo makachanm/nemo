@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func Prompt(mustfilled bool) string {
+func Prompt(mustfilled bool) (string, error) {
 	var result string
 	var ioerr error
 	red := bufio.NewReader(os.Stdin)
@@ -16,7 +16,7 @@ func Prompt(mustfilled bool) string {
 		result, ioerr = red.ReadString('\n')
 
 		if ioerr != nil {
-			panic(ioerr)
+			return "", ioerr
 		}
 
 		if result == "\n" && mustfilled {
@@ -26,8 +26,7 @@ func Prompt(mustfilled bool) string {
 
 		result = strings.ReplaceAll(result, "\n", "")
 		break
-
 	}
 
-	return result
+	return result, nil
 }

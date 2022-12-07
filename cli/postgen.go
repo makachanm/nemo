@@ -1,31 +1,49 @@
 package cli
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 )
 
 func GeneratePost() {
-	wd, _ := os.Getwd()
-
-	year := strconv.Itoa(time.Now().Year())
-	month := strconv.Itoa(int(time.Now().Month()))
-	day := strconv.Itoa(time.Now().Day())
-	hour := strconv.Itoa(time.Now().Hour())
-	min := strconv.Itoa(time.Now().Minute())
+	now := time.Now()
+	year := strconv.Itoa(now.Year())
+	month := strconv.Itoa(int(now.Month()))
+	day := strconv.Itoa(now.Day())
+	hour := strconv.Itoa(now.Hour())
+	min := strconv.Itoa(now.Minute())
 
 	timest := fmt.Sprintf("year=%v,month=%v,day=%v,hour=%v,min=%v", year, month, day, hour, min)
-	bobTheBuilder := fmt.Sprintf("%v%v%v%v%v", year, month, day, hour, min)
 
-	postctx := `
+	postFileName := fmt.Sprintf("%v%v%v%v%v", year, month, day, hour, min)
+
+	postctx := fmt.Sprintf(`
 $[title Title]
 $[summary Summary of Post]
-$[timestamp(` + timest + `)]
+$[timestamp(%v)]
 $[tag Tags]
-==========`
+==========`, timest)
 
-	dir := wd + "/post/" + bobTheBuilder + ".ps"
-	os.WriteFile(dir, []byte(postctx), 0777)
+	postFilePath := filepath.Join("post", postFileName+".ps")
+
+	postFile, err := os.Create(postFilePath)
+	if err != nil {
+		log.Println(err)
+	}
+	defer func(postFile *os.File) {
+		err := postFile.Close()
+		if err != nil {
+			log.Println(err)
+		}
+	}(postFile)
+
+	if _, err := io.Copy(postFile, bytes.NewBuffer([]byte(postctx))); err != nil {
+		log.Println(err)
+	}
 }

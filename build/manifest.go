@@ -13,31 +13,25 @@ type Manifest struct {
 	Repo   string `json:"repository"`
 }
 
-func GetManifest() Manifest {
-	wd, perr := os.Getwd()
-
-	if perr != nil {
-		panic(perr)
+func GetManifest() (Manifest, error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return Manifest{}, err
 	}
 
-	_, maniexist := os.Stat(wd + "/manifest.json")
-	if os.IsNotExist(maniexist) {
-		fmt.Println("Manifest is not exist")
-		os.Exit(1)
+	if _, err := os.Stat(wd + "/manifest.json"); os.IsNotExist(err) {
+		return Manifest{}, fmt.Errorf("manifest file does not exist")
 	}
 
-	ctx, ferr := os.ReadFile(wd + "/manifest.json")
-
-	if ferr != nil {
-		panic(ferr)
+	ctx, err := os.ReadFile(wd + "/manifest.json")
+	if err != nil {
+		return Manifest{}, err
 	}
 
 	var sinfo = Manifest{}
-	jerr := json.Unmarshal(ctx, &sinfo)
-
-	if jerr != nil {
-		panic(jerr)
+	if err := json.Unmarshal(ctx, &sinfo); err != nil {
+		return Manifest{}, err
 	}
 
-	return sinfo
+	return sinfo, nil
 }
