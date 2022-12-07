@@ -6,15 +6,22 @@ import (
 )
 
 type Interface struct {
+	Usage string
 }
 
 func MakeCli() Interface {
-	return Interface{}
+	return Interface{
+		Usage: "Usage: nemo <command>\n\n" +
+			"Commands:\n" +
+			"  build       Build the site\n" +
+			"  newpost     Create a new post\n" +
+			"  create      Create a new space\n",
+	}
 }
 
 func (ci *Interface) Handle(args []string) {
 	if len(args) < 2 {
-		fmt.Println("not enough arguments")
+		fmt.Println(ci.Usage)
 		return
 	}
 
@@ -29,7 +36,8 @@ func (ci *Interface) Handle(args []string) {
 		createNewSpace()
 
 	default:
-		fmt.Println("unknown command")
+		fmt.Println("\x1b[31merror\x1b[0m: unknown command")
+		fmt.Println("\n", ci.Usage)
 	}
 }
 
