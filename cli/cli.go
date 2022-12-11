@@ -6,9 +6,10 @@ import (
 )
 
 const (
-	BuildCommand   = "build"
-	NewPostCommand = "newpost"
-	CreateCommand  = "create"
+	BuildCommand    = "build"
+	NewPostCommand  = "newpost"
+	CreateCommand   = "create"
+	ShowHelpMessage = "help"
 )
 
 type Interface struct {
@@ -23,12 +24,15 @@ func MakeCli() Interface {
 Commands:
   build       Build the site
   newpost     Create a new post
-  create      Create a new space`,
+  create      Create a new space
+  help        Print this help message
+`,
 
 		commandMap: map[string]func(){
-			BuildCommand:   buildHandler,
-			NewPostCommand: GeneratePost,
-			CreateCommand:  createNewSpace,
+			BuildCommand:    buildHandler,
+			NewPostCommand:  GeneratePost,
+			CreateCommand:   createNewSpace,
+			ShowHelpMessage: printHelpMessage,
 		},
 	}
 
@@ -59,4 +63,8 @@ func buildHandler() {
 	build.MakeNewBuilder(&b)
 
 	b.Build()
+}
+
+func printHelpMessage() {
+	fmt.Println(MakeCli().Usage)
 }
