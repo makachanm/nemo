@@ -4,9 +4,10 @@ ARCH = $(shell uname -m)
 
 LDINFO = -X main.BuildDate=$(DATE) -X main.Arch=$(ARCH)
 LDFLAGS = -s -o artifact
+OPFLAGS = -trimpath 
 
 nemo :
-	$(CC) build -ldflags "$(LDINFO)"
+	$(CC) build $(OPFLAGS) -ldflags "$(LDINFO)"
 
 clean :
 	rm nemo
