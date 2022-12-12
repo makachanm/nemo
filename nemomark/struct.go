@@ -4,8 +4,10 @@ type Token int
 type NodeType int
 
 type Block struct {
-	token Token
-	item  string
+	token    Token
+	item     string
+	startpos int64
+	endpos   int64
 }
 
 type BlockStack struct {
