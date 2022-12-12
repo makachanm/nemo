@@ -327,6 +327,7 @@ func (b *Builder) buildAboutPage() {
 	document.Nav = nav
 
 	document.BuildInfo = b.vinfo.GetInfo() //WIP
+	document.SkinInfo = b.Skin.Info
 	document.AuthorInfo = b.Manifest.Author
 
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.About)
