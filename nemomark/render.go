@@ -12,69 +12,37 @@ func NewRenderer() Renderer {
 }
 
 func (rd *Renderer) itemRender(input ExprNode) string {
-	var builded string
-	var handler = MarkdownHandlers
-	var stringbuilder strings.Builder
+	var result strings.Builder
 
 	if input.NodeType == TypeString {
-		ctx := RenderPlain(input.Context)
-		stringbuilder.WriteString(builded)
-		stringbuilder.WriteString(ctx)
-
-		builded = stringbuilder.String()
-		stringbuilder.Reset()
+		result.WriteString(RenderPlain(input.Context))
 	} else {
-		handle, isFuncExist := handler[input.FuncContext.FucntionName]
-		if isFuncExist {
+		if handler, ok := MarkdownHandlers[input.FuncContext.FucntionName]; ok {
 			renderTarget := input.FuncContext
-			childstr := ""
 			if input.HasChild {
 				var childstrbuilder strings.Builder
 				for _, childNode := range input.Child {
-					childctx := rd.itemRender(childNode)
-					childstrbuilder.WriteString(childstr)
-					childstrbuilder.WriteString(childctx)
-
-					childstr = childstrbuilder.String()
-					childstrbuilder.Reset()
+					childstrbuilder.WriteString(rd.itemRender(childNode))
 				}
-				renderTarget.Context = []string{childstr}
+				renderTarget.Context = []string{childstrbuilder.String()}
 			}
-
-			ctx := handle(renderTarget)
-			stringbuilder.WriteString(builded)
-			stringbuilder.WriteString(ctx)
-
-			builded = stringbuilder.String()
-			stringbuilder.Reset()
+			result.WriteString(handler(renderTarget))
 		}
 	}
 
-	return builded
+	return result.String()
 }
 
 func (rd *Renderer) render(input ExprNode) string {
-	var builded string
-	//var handler = Markdown_Handlers
-	var stringbuilder strings.Builder
-
-	originNode := input
-	if !(originNode.NodeType == TypeSection) {
+	if input.NodeType != TypeSection {
 		return ""
 	}
 
-	originChildNode := originNode.Child
-
-	for _, node := range originChildNode {
+	var result string
+	for _, node := range input.Child {
 		rctx := rd.itemRender(node)
-		stringbuilder.WriteString(builded)
-		stringbuilder.WriteString(rctx)
-
-		builded = stringbuilder.String()
-		stringbuilder.Reset()
+		result += rctx
 	}
 
-	taggedResult := "<p>" + builded + "</p>"
-	return taggedResult
-	//return builded
+	return "<p>" + result + "</p>"
 }
