@@ -1,8 +1,8 @@
 # Nemomark Guide
-Nemomark is speical syntax for help writing rich document.
+Nemomark is special syntax for help writing rich document.
 
 # First step 
-Nemomark is basically made up with "functions". Basic form of function is like this:
+Nemomark is made up of "functions". Basic form of function is like this:
 
 ``` 
 $[func-name(argument1=value1) Content]
@@ -13,7 +13,7 @@ For example, if you want to bold a text, you can use function like this:
 $[bold Hello] New World!
 ```
 
-When text is contain Nemomark's function syntax string, Nemomark cannot do a corect display of text.
+When text is contain Nemomark's function syntax string, Nemomark cannot display the text correctly.
 
 To solve problem, you can use "Ignore" syntax.
 ``` 
@@ -61,12 +61,12 @@ func foo(bar string[]) string {
 #### Image 
 ``` $[image(url=imagesrc) Alt Text] ```
 
-If you want to use your own image, 
+To use your own image, 
  1. Put your image file to ``"/post/res"``.
  2. Link your image like this: 
  ``` $[image(url=./res/yourimage.png)] ```
 
 #### Code 
-**RECOMMEND TO USE "IGNORE SYNTAX"**
+**WE RECOMMEND USING "IGNORE SYNTAX"**
 
 ``` $[code `func yourcode(foo strings[]){ //This is Sample Code }`] ```
