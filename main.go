@@ -2,16 +2,16 @@ package main
 
 import (
 	"nemo/cli"
+	"nemo/utils"
 	"os"
 )
 
-/*
 var (
-	Version, BuildDate string
+	BuildDate, Arch string
 )
-*/
 
 func main() {
-	app := cli.MakeCli()
+	vinfo := utils.MakeVersionInfo(BuildDate, Arch)
+	app := cli.MakeCli(vinfo)
 	app.Handle(os.Args)
 }

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"nemo/build"
+	"nemo/utils"
 	"os"
 )
 
@@ -12,7 +13,7 @@ New workspace is created.
 Before you start, You must install skin to /skin directory.
 Read guide about setting up skin for your workspace.`
 
-func createNewSpace() {
+func createNewSpace(vinfo utils.VersionInfo) {
 	wd, _ := os.Getwd()
 	_, maniexist := os.Stat("manifest.json")
 

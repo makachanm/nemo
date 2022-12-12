@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"nemo/nemomark"
+	"nemo/utils"
 	"os"
 	"sort"
 	"strconv"
@@ -23,9 +24,10 @@ type Builder struct {
 	TagLengths   int
 	IndexPageNum int
 	wd           string
+	vinfo        utils.VersionInfo
 }
 
-func MakeNewBuilder(b *Builder) {
+func MakeNewBuilder(b *Builder, vinfo utils.VersionInfo) {
 	mfest, err := GetManifest()
 	if err != nil {
 		return
@@ -34,6 +36,7 @@ func MakeNewBuilder(b *Builder) {
 	b.Skin = MakeSkin()
 	b.Manifest = mfest
 	b.TagList = make(map[string][]DocumentMeta)
+	b.vinfo = vinfo
 }
 
 func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
@@ -323,7 +326,7 @@ func (b *Builder) buildAboutPage() {
 	}
 	document.Nav = nav
 
-	document.BuildInfo = "" //WIP
+	document.BuildInfo = b.vinfo.GetInfo() //WIP
 	document.AuthorInfo = b.Manifest.Author
 
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.About)

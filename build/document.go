@@ -68,6 +68,7 @@ type AboutPage struct {
 	Nav        Nav
 	Content    string
 	BuildInfo  string
+	SkinInfo   string
 	AuthorInfo string
 }
 

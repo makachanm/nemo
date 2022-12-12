@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"nemo/utils"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
 )
 
-func GeneratePost() {
+func GeneratePost(vinfo utils.VersionInfo) {
 	now := time.Now()
 	year := strconv.Itoa(now.Year())
 	month := strconv.Itoa(int(now.Month()))

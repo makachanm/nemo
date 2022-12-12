@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"nemo/build"
+	"nemo/utils"
 )
 
 const (
@@ -13,11 +14,12 @@ const (
 )
 
 type Interface struct {
-	Usage      string
-	commandMap map[string]func()
+	Usage       string
+	commandMap  map[string]func(utils.VersionInfo)
+	versionInfo utils.VersionInfo
 }
 
-func MakeCli() Interface {
+func MakeCli(vinfo utils.VersionInfo) Interface {
 	ci := Interface{
 		Usage: `Usage: nemo <command>
 
@@ -28,12 +30,14 @@ Commands:
   help        Print this help message
 `,
 
-		commandMap: map[string]func(){
+		commandMap: map[string]func(utils.VersionInfo){
 			BuildCommand:    buildHandler,
 			NewPostCommand:  GeneratePost,
 			CreateCommand:   createNewSpace,
 			ShowHelpMessage: printHelpMessage,
 		},
+
+		versionInfo: vinfo,
 	}
 
 	return ci
@@ -54,17 +58,17 @@ func (ci *Interface) Handle(args []string) {
 		return
 	}
 
-	handler()
+	handler(ci.versionInfo)
 }
 
-func buildHandler() {
+func buildHandler(vinfo utils.VersionInfo) {
 	var b build.Builder
 
-	build.MakeNewBuilder(&b)
+	build.MakeNewBuilder(&b, vinfo)
 
 	b.Build()
 }
 
-func printHelpMessage() {
-	fmt.Println(MakeCli().Usage)
+func printHelpMessage(vinfo utils.VersionInfo) {
+	fmt.Println(MakeCli(vinfo).Usage)
 }
