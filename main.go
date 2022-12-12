@@ -7,11 +7,11 @@ import (
 )
 
 var (
-	BuildDate, Arch string
+	BuildDate, Arch, Version string
 )
 
 func main() {
-	vinfo := utils.MakeVersionInfo(BuildDate, Arch)
+	vinfo := utils.MakeVersionInfo(BuildDate, Arch, Version)
 	app := cli.MakeCli(vinfo)
 	app.Handle(os.Args)
 }

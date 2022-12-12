@@ -26,6 +26,7 @@ type SkinInfo struct {
 	Name    string     `json:"name"`
 	Author  string     `json:"author"`
 	Summary string     `json:"summary"`
+	Repo    string     `json:"repo"`
 	Conf    SkinConfig `json:"config"`
 	Paths   SkinPath   `json:"paths"`
 }
