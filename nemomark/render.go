@@ -17,7 +17,7 @@ func (rd *Renderer) itemRender(input ExprNode) string {
 	if input.NodeType == TypeString {
 		result.WriteString(RenderPlain(input.Context))
 	} else {
-		if handler, ok := MarkdownHandlers[input.FuncContext.FucntionName]; ok {
+		if handler, ok := MarkdownHandlers[input.FuncContext.FunctionName]; ok {
 			renderTarget := input.FuncContext
 			if input.HasChild {
 				var childstrbuilder strings.Builder

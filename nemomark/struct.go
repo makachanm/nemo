@@ -4,14 +4,14 @@ type Token int
 type NodeType int
 
 type Block struct {
-	token    Token
-	item     string
-	startpos int64
-	endpos   int64
+	Token    Token
+	Item     string
+	StartPos int64
+	EndPos   int64
 }
 
 type BlockStack struct {
-	blockList []Block
+	BlockList []Block
 }
 
 type ExprNode struct {
@@ -24,14 +24,14 @@ type ExprNode struct {
 }
 
 type MarkdownFucntion struct {
-	FucntionName string
+	FunctionName string
 	Args         map[string]string
 	Context      []string
 }
 
 type BraketCounter struct {
-	open  int
-	close int
+	Open  int
+	Close int
 }
 
 const (
@@ -57,122 +57,124 @@ var TokenMap = map[string]Token{
 }
 
 func NewBlockStack() BlockStack {
-	return BlockStack{blockList: []Block{}}
+	return BlockStack{BlockList: []Block{}}
 }
 
-func MakeExprNode(p NodeType, c []string) ExprNode {
+func MakeExprNode(nodeType NodeType, context []string) ExprNode {
 	return ExprNode{
-		NodeType: p,
-		Context:  c,
+		NodeType: nodeType,
+		Context:  context,
 	}
 }
 
-func MakeFunctionNode(fcname string, args map[string]string, context []string) ExprNode {
+func MakeFunctionNode(functionName string, args map[string]string, context []string) ExprNode {
 	mkFunc := MarkdownFucntion{
-		FucntionName: fcname,
+		FunctionName: functionName,
 		Args:         args,
 		Context:      context,
 	}
 	exnode := MakeExprNode(TypeFunc, nil)
-	exnode.setIsFunction(true)
-	exnode.setFuncContext(mkFunc)
+	exnode.SetIsFunction(true)
+	exnode.SetFuncContext(mkFunc)
 
 	return exnode
 }
 
 func MakeBraketCounter() BraketCounter {
 	return BraketCounter{
-		open:  0,
-		close: 0,
+		Open:  0,
+		Close: 0,
 	}
 }
 
-func (s *BlockStack) appendStack(si BlockStack, start int, end int) {
-	s.blockList = append(s.blockList, si.blockList[start:end]...)
+func (s *BlockStack) AppendStack(si BlockStack, start int, end int) {
+	s.BlockList = append(s.BlockList, si.BlockList[start:end]...)
 }
 
-func (s *BlockStack) blockPush(b Block) {
-	s.blockList = append(s.blockList, b)
+func (s *BlockStack) BlockPush(b Block) {
+	s.BlockList = append(s.BlockList, b)
 }
 
-func (s *BlockStack) blockPop() Block {
-	if len(s.blockList) == 0 {
+func (s *BlockStack) BlockPop() Block {
+	if len(s.BlockList) == 0 {
 		return Block{}
 	}
-	data := s.blockList[(len(s.blockList) - 1)]
-	s.blockList = s.blockList[:(len(s.blockList) - 1)]
+	data := s.BlockList[(len(s.BlockList) - 1)]
+	s.BlockList = s.BlockList[:(len(s.BlockList) - 1)]
 	return data
 }
 
 // BlockStack
-func (s *BlockStack) clear() []Block {
-	data := s.blockList
-	s.blockList = nil
+
+func (s *BlockStack) Clear() []Block {
+	data := s.BlockList
+	s.BlockList = nil
 	return data
 }
 
-func (s *BlockStack) length() int {
-	return len(s.blockList)
+func (s *BlockStack) Length() int {
+	return len(s.BlockList)
 }
 
-func (s *BlockStack) seek() Block {
-	if len(s.blockList) == 0 {
+func (s *BlockStack) Seek() Block {
+	if len(s.BlockList) == 0 {
 		return Block{}
 	}
-	return s.blockList[(len(s.blockList) - 1)]
+	return s.BlockList[(len(s.BlockList) - 1)]
 }
 
 // ExprNode
-func (e *ExprNode) singleInsert(c ExprNode) {
-	e.Child = append(e.Child, c)
-	e.setHasChild(true)
+
+func (e *ExprNode) SingleInsert(child ExprNode) {
+	e.Child = append(e.Child, child)
+	e.SetHasChild(true)
 }
 
-func (e *ExprNode) insert(c []ExprNode) {
-	e.Child = append(e.Child, c...)
-	e.setHasChild(true)
+func (e *ExprNode) Insert(child []ExprNode) {
+	e.Child = append(e.Child, child...)
+	e.SetHasChild(true)
 }
 
-func (e *ExprNode) setHasChild(b bool) {
-	e.HasChild = b
+func (e *ExprNode) SetHasChild(hasChild bool) {
+	e.HasChild = hasChild
 }
 
-func (e *ExprNode) setIsFunction(b bool) {
-	e.IsFuncitonNode = b
+func (e *ExprNode) SetIsFunction(isFunction bool) {
+	e.IsFuncitonNode = isFunction
 }
 
-func (e *ExprNode) setFuncContext(c MarkdownFucntion) {
-	e.FuncContext = c
+func (e *ExprNode) SetFuncContext(funcContext MarkdownFucntion) {
+	e.FuncContext = funcContext
 }
 
 //BraketCounter
 
-func (b *BraketCounter) incOpen() {
-	b.open++
+func (b *BraketCounter) IncOpen() {
+	b.Open++
 }
 
-func (b *BraketCounter) incClose() {
-	b.close++
+func (b *BraketCounter) IncClose() {
+	b.Close++
 }
 
-func (b *BraketCounter) decOpen() {
-	b.open--
+func (b *BraketCounter) DecOpen() {
+	b.Open--
 }
 
-func (b *BraketCounter) decClose() {
-	b.close--
+func (b *BraketCounter) DecClose() {
+	b.Close--
 }
 
-func (b *BraketCounter) decCounter() {
-	b.decOpen()
-	b.decClose()
+func (b *BraketCounter) DecCounter() {
+	b.DecOpen()
+	b.DecClose()
 }
 
-func (b *BraketCounter) clear() {
-	b.open = 0
-	b.close = 0
+func (b *BraketCounter) Clear() {
+	b.Open = 0
+	b.Close = 0
 }
 
-func (b *BraketCounter) isBlocked() bool {
-	return b.open == b.close
+func (b *BraketCounter) IsBlocked() bool {
+	return b.Open == b.Close
 }

@@ -141,7 +141,7 @@ func (d *Document) ParseMeta(input string) {
 	parseResult := parser.Parse(&lexed)
 
 	for _, ctx := range parseResult.Child {
-		switch ctx.FuncContext.FucntionName {
+		switch ctx.FuncContext.FunctionName {
 		case "title":
 			tagsData := ctx.FuncContext.Context[0]
 			if len(tagsData) <= 0 || tagsData == "" {
