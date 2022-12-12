@@ -40,7 +40,7 @@ func MakeNewBuilder(b *Builder, vinfo utils.VersionInfo) {
 }
 
 func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
-	markup := nemomark.MakeNemomark()
+	markup := nemomark.NewNemomark()
 
 	ctx, perr := os.ReadFile(postpath)
 
@@ -289,7 +289,7 @@ func (b *Builder) buildTagsPage() {
 }
 
 func (b *Builder) buildAboutPage() {
-	markup := nemomark.MakeNemomark()
+	markup := nemomark.NewNemomark()
 
 	ctx, perr := os.ReadFile(b.wd + "/post/about.ps")
 

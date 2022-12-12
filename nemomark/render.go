@@ -33,7 +33,7 @@ func (rd *Renderer) itemRender(input ExprNode) string {
 	return result.String()
 }
 
-func (rd *Renderer) render(input ExprNode) string {
+func (rd *Renderer) Render(input ExprNode) string {
 	if input.NodeType != TypeSection {
 		return ""
 	}

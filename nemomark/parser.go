@@ -27,7 +27,7 @@ func returnString(s *string, idx int) string {
 	return string((*s)[idx])
 }
 
-func addBlock(b *[]Block, t Token, i string, stpos int64, endpos int64) []Block {
+func addBlock(b *[]Block, t Token, i string) []Block {
 	return append(*b, Block{token: t, item: i})
 }
 
@@ -67,13 +67,13 @@ func (l *Lexer) Tokenize(input string, tokenmap map[string]Token) []Block {
 					Blocks[len(Blocks)-1].item = previtem + curitem
 					pointer = (iidx - pointer) + pointer + 1
 				} else {
-					Blocks = addBlock(&Blocks, TokenString, input[(pointer+1):iidx], (int64(pointer + 1)), (int64(iidx)))
+					Blocks = addBlock(&Blocks, TokenString, input[(pointer+1):iidx])
 					pointer = (iidx - pointer) + pointer + 1
 				}
 
 			} else {
 				//Tokenize current string.
-				Blocks = addBlock(&Blocks, tokenVal, "", (int64(pointer)), int64(pointer))
+				Blocks = addBlock(&Blocks, tokenVal, "")
 				pointer++
 			}
 
@@ -92,7 +92,7 @@ func (l *Lexer) Tokenize(input string, tokenmap map[string]Token) []Block {
 				idx++ //increase pointer (not eol)
 			}
 			//Cut string and tokenize. [Strat of Stirng to End of String]
-			Blocks = addBlock(&Blocks, TokenString, input[pointer:idx], int64(pointer), int64(idx))
+			Blocks = addBlock(&Blocks, TokenString, input[pointer:idx])
 			pointer = (idx - pointer) + pointer
 		}
 	}
