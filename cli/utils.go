@@ -8,24 +8,24 @@ import (
 )
 
 func Prompt(mustfilled bool) (string, error) {
+	reader := bufio.NewReader(os.Stdin)
 	var result string
-	var ioerr error
-	red := bufio.NewReader(os.Stdin)
 
 	for {
-		result, ioerr = red.ReadString('\n')
+		result, ioerr := reader.ReadString('\n')
 
 		if ioerr != nil {
 			return "", ioerr
 		}
 
-		if result == "\n" && mustfilled {
-			fmt.Println("required field")
-			continue
+		// Trim the newline character from the input
+		result = strings.TrimSuffix(result, "\n")
+
+		if result != "" || !mustfilled {
+			break
 		}
 
-		result = strings.ReplaceAll(result, "\n", "")
-		break
+		fmt.Println("required field")
 	}
 
 	return result, nil
