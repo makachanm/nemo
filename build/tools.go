@@ -19,6 +19,11 @@ func (t *TemplateTools) GetTimeStamp(stamp TimeStamp) string {
 	return ttime.Format(t.skconfig.DateType)
 }
 
+func (t *TemplateTools) GetTodayStamp() string {
+	ttime := time.Now()
+	return ttime.Format(t.skconfig.DateType)
+}
+
 func (t *TemplateTools) GetTagnameHash(name string) string {
 	hashbyte := md5.Sum([]byte(name))
 	nhash := hex.EncodeToString(hashbyte[:])

@@ -337,6 +337,18 @@ func (b *Builder) buildAboutPage() {
 	}
 
 	var builder template.Template
+	tl := NewTemplateTools(b.Skin.Info.Conf)
+	builder.Funcs(template.FuncMap{
+		"GetTimeStamp": func(t TimeStamp) string {
+			return tl.GetTimeStamp(t)
+		},
+		"GetTagnameHash": func(n string) string {
+			return tl.GetTagnameHash(n)
+		},
+		"GetTodayStamp": func() string {
+			return tl.GetTodayStamp()
+		},
+	})
 
 	t, err := builder.Parse(string(file))
 
