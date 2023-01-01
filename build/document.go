@@ -115,20 +115,21 @@ func (t *TimeStamp) StampSize() int {
 }
 
 func (t *TimeStamp) isBiggerStamp(src TimeStamp, cmp TimeStamp) bool {
-	if (src.Year >= cmp.Year) && (src.Month >= cmp.Month) && (src.Hour >= cmp.Hour) {
-		if !(src.Day >= cmp.Day) {
-			return false
-		}
-
-		if src.Min >= cmp.Min {
-			return true
-		} else {
-			return false
-		}
-
-	} else {
+	if src.Year > cmp.Year {
 		return true
+	} else if src.Month > cmp.Month {
+		return true
+	} else if src.Month == cmp.Month {
+		if src.Day > cmp.Day {
+			return true
+		} else if src.Hour > cmp.Hour {
+			return true
+		} else if src.Min > cmp.Min {
+			return true
+		}
 	}
+
+	return false
 }
 
 func (d *Document) ParseMeta(input string) {
