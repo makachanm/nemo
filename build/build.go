@@ -501,7 +501,6 @@ func (b *Builder) Build() {
 
 	sort.Slice(b.PostList, func(i, j int) bool {
 		tsp := TimeStamp{}
-		fmt.Printf("CP: [i] %s -, [j] %s, VA %v TSPI: %v, TSPJ: %v\n", b.PostList[i].Title, b.PostList[j].Title, tsp.isBiggerStamp(b.PostList[i].Timestamp, b.PostList[j].Timestamp), b.PostList[i].Timestamp, b.PostList[j].Timestamp)
 		return tsp.isBiggerStamp(b.PostList[i].Timestamp, b.PostList[j].Timestamp)
 	})
 
