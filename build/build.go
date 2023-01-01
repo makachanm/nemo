@@ -487,14 +487,14 @@ func (b *Builder) Build() {
 	}
 
 	for tkey, tele := range b.TagList {
-		taglistBefore := tele
+		tagsort := tele
 
-		sort.Slice(taglistBefore, func(i, j int) bool {
+		sort.Slice(tagsort, func(i, j int) bool {
 			tsp := TimeStamp{}
-			return !tsp.isBiggerStamp(taglistBefore[i].Timestamp, taglistBefore[j].Timestamp)
+			return tsp.isBiggerStamp(tele[i].Timestamp, tele[j].Timestamp)
 		})
 
-		b.TagList[tkey] = taglistBefore
+		b.TagList[tkey] = tagsort
 	}
 
 	//fmt.Println("TGL :", b.TagList)
