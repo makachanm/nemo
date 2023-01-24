@@ -24,7 +24,7 @@ func (rd *Renderer) itemRender(input ExprNode) string {
 				for _, childNode := range input.Child {
 					childstrbuilder.WriteString(rd.itemRender(childNode))
 				}
-				renderTarget.Context = []string{childstrbuilder.String()}
+				renderTarget.Context = append(renderTarget.Context, childstrbuilder.String())
 			}
 			result.WriteString(handler(renderTarget))
 		}

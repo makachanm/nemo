@@ -3,6 +3,11 @@ package nemomark
 type Token int
 type NodeType int
 
+type TokMapElement struct {
+	Token     Token
+	MatchChar string
+}
+
 type Block struct {
 	Token    Token
 	Item     string
@@ -56,6 +61,13 @@ var TokenMap = map[string]Token{
 	"`": TokenIgnore,
 }
 
+var NTokenMap = map[string]TokMapElement{
+	"$": TokMapElement{Token: TokenFunc, MatchChar: "$"},
+	"[": TokMapElement{Token: TokenBlockStart, MatchChar: "["},
+	"]": TokMapElement{Token: TokenBlockEnd, MatchChar: "]"},
+	"`": TokMapElement{Token: TokenIgnore, MatchChar: "`"},
+}
+
 func NewBlockStack() BlockStack {
 	return BlockStack{BlockList: []Block{}}
 }
@@ -89,6 +101,13 @@ func MakeBraketCounter() BraketCounter {
 
 func (s *BlockStack) AppendStack(si BlockStack, start int, end int) {
 	s.BlockList = append(s.BlockList, si.BlockList[start:end]...)
+}
+
+func (s *BlockStack) AppendArray(bas *[]Block, start int, end int) {
+	lsb := (*bas)[start:(end + 1)]
+	s.BlockList = append(s.BlockList, lsb...)
+
+	RemoveElementBlockArray(bas, end)
 }
 
 func (s *BlockStack) BlockPush(b Block) {
@@ -176,5 +195,9 @@ func (b *BraketCounter) Clear() {
 }
 
 func (b *BraketCounter) IsBlocked() bool {
-	return b.Open == b.Close
+	return (b.Open == b.Close) && ((b.Open != 0) && (b.Close != 0))
+}
+
+func (b *BraketCounter) IsZero() bool {
+	return ((b.Open == 0) && (b.Close == 0))
 }

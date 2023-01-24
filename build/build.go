@@ -17,6 +17,7 @@ import (
 const Spliter = "==========\n"
 
 type Builder struct {
+	MarkBuilder  nemomark.Nemomark
 	Manifest     Manifest
 	Skin         Skin
 	PostList     []DocumentMeta
@@ -37,10 +38,11 @@ func MakeNewBuilder(b *Builder, vinfo utils.VersionInfo) {
 	b.Manifest = mfest
 	b.TagList = make(map[string][]DocumentMeta)
 	b.vinfo = vinfo
+	b.MarkBuilder = *nemomark.NewNemomark(false)
 }
 
 func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
-	markup := nemomark.NewNemomark()
+	markup := b.MarkBuilder
 
 	ctx, perr := os.ReadFile(postpath)
 
@@ -289,7 +291,7 @@ func (b *Builder) buildTagsPage() {
 }
 
 func (b *Builder) buildAboutPage() {
-	markup := nemomark.NewNemomark()
+	markup := b.MarkBuilder
 
 	ctx, perr := os.ReadFile(b.wd + "/post/about.ps")
 
