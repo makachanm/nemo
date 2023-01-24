@@ -2,7 +2,7 @@ manifest.json
 nemo
 *_test.go
 *_test.sh
-compile.sh
+build-test.sh
 todo
 
 /dist
