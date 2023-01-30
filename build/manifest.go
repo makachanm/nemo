@@ -11,6 +11,7 @@ type Manifest struct {
 	Lang   string `json:"lang"`
 	Author string `json:"author"`
 	Repo   string `json:"repository"`
+	Domain string `json:"domain"`
 }
 
 func GetManifest() (Manifest, error) {

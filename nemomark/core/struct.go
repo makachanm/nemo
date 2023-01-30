@@ -1,4 +1,4 @@
-package nemomark
+package core
 
 type Token int
 type NodeType int

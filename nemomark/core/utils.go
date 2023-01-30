@@ -1,4 +1,4 @@
-package nemomark
+package core
 
 func GetChar(s *string, idx int) string {
 	return string((*s)[idx])

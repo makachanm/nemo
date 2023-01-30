@@ -1,4 +1,4 @@
-package nemomark
+package core
 
 import (
 	"strings"
@@ -17,6 +17,7 @@ func (rd *Renderer) itemRender(input ExprNode) string {
 	if input.NodeType == TypeString {
 		result.WriteString(RenderPlain(input.Context))
 	} else {
+
 		if handler, ok := MarkdownHandlers[input.FuncContext.FunctionName]; ok {
 			renderTarget := input.FuncContext
 			if input.HasChild {

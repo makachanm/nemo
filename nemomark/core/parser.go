@@ -1,4 +1,4 @@
-package nemomark
+package core
 
 import (
 	"strings"

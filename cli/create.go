@@ -50,6 +50,13 @@ func createNewSpace(vinfo utils.VersionInfo) {
 		return
 	}
 
+	fmt.Println("? Domain (optional, need for generate RSS Feed):")
+	bdom, err := Prompt(false)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	err = os.Mkdir("post", os.ModePerm)
 	if err != nil {
 		fmt.Println("Error creating post directory:", err)
@@ -67,6 +74,7 @@ func createNewSpace(vinfo utils.VersionInfo) {
 		Author: bauthor,
 		Lang:   blang,
 		Repo:   brepo,
+		Domain: bdom,
 	}
 
 	manibuild, err := json.Marshal(manifest)

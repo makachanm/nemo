@@ -1,6 +1,7 @@
 package nemomark
 
 import (
+	"nemo/nemomark/core"
 	"strings"
 )
 
@@ -8,8 +9,8 @@ type Lexer struct {
 }
 
 type Parser struct {
-	funcBuffer BlockStack
-	bcounter   BraketCounter
+	funcBuffer core.BlockStack
+	bcounter   core.BraketCounter
 }
 
 func NewLexer() Lexer {
@@ -18,8 +19,8 @@ func NewLexer() Lexer {
 
 func NewParser() Parser {
 	return Parser{
-		funcBuffer: NewBlockStack(),
-		bcounter:   MakeBraketCounter(),
+		funcBuffer: core.NewBlockStack(),
+		bcounter:   core.MakeBraketCounter(),
 	}
 }
 
@@ -27,16 +28,16 @@ func returnString(s *string, idx int) string {
 	return string((*s)[idx])
 }
 
-func addBlock(b *[]Block, t Token, i string) []Block {
-	return append(*b, Block{Token: t, Item: i})
+func addBlock(b *[]core.Block, t core.Token, i string) []core.Block {
+	return append(*b, core.Block{Token: t, Item: i})
 }
 
-func appendEol(b *[]Block) []Block {
-	return append(*b, Block{Token: TokenEol})
+func appendEol(b *[]core.Block) []core.Block {
+	return append(*b, core.Block{Token: core.TokenEol})
 }
 
-func (l *Lexer) Tokenize(input string, tokenmap map[string]Token) []Block {
-	var Blocks []Block
+func (l *Lexer) Tokenize(input string, tokenmap map[string]core.Token) []core.Block {
+	var Blocks []core.Block
 	var pointer = 0
 	var lengths = len(input)
 
@@ -45,9 +46,9 @@ func (l *Lexer) Tokenize(input string, tokenmap map[string]Token) []Block {
 		tokenVal, keyExist := tokenmap[currentString]
 
 		if keyExist {
-			if tokenVal == TokenIgnore {
+			if tokenVal == core.TokenIgnore {
 				iidx := pointer
-				iisBreak := tokenVal == TokenIgnore
+				iisBreak := tokenVal == core.TokenIgnore
 
 				for iisBreak {
 					//Check idx is smaller than lengths. make break when string pointer is encountered eol.
@@ -56,18 +57,18 @@ func (l *Lexer) Tokenize(input string, tokenmap map[string]Token) []Block {
 						break
 					}
 					t, r := tokenmap[returnString(&input, iidx+1)]
-					iisBreak = !(r && t == TokenIgnore)
+					iisBreak = !(r && t == core.TokenIgnore)
 					iidx++
 				}
 
-				if len(Blocks) > 2 && Blocks[len(Blocks)-1].Token == TokenString {
+				if len(Blocks) > 2 && Blocks[len(Blocks)-1].Token == core.TokenString {
 					previtem := Blocks[len(Blocks)-1].Item
 					curitem := input[(pointer + 1):iidx]
 
 					Blocks[len(Blocks)-1].Item = previtem + curitem
 					pointer = (iidx - pointer) + pointer + 1
 				} else {
-					Blocks = addBlock(&Blocks, TokenString, input[(pointer+1):iidx])
+					Blocks = addBlock(&Blocks, core.TokenString, input[(pointer+1):iidx])
 					pointer = (iidx - pointer) + pointer + 1
 				}
 
@@ -92,7 +93,7 @@ func (l *Lexer) Tokenize(input string, tokenmap map[string]Token) []Block {
 				idx++ //increase pointer (not eol)
 			}
 			//Cut string and tokenize. [Strat of Stirng to End of String]
-			Blocks = addBlock(&Blocks, TokenString, input[pointer:idx])
+			Blocks = addBlock(&Blocks, core.TokenString, input[pointer:idx])
 			pointer = (idx - pointer) + pointer
 		}
 	}
@@ -102,13 +103,13 @@ func (l *Lexer) Tokenize(input string, tokenmap map[string]Token) []Block {
 	return Blocks
 }
 
-func (p *Parser) Parse(input *[]Block) ExprNode {
+func (p *Parser) Parse(input *[]core.Block) core.ExprNode {
 	var Blocks = *input
-	var Head = MakeExprNode(TypeSection, nil) //Head of tree.
+	var Head = core.MakeExprNode(core.TypeSection, nil) //Head of tree.
 	var pointer = 0
 	var lengths = len(Blocks)
 
-	var Stack = NewBlockStack() //Stack for StackParse.
+	var Stack = core.NewBlockStack() //Stack for StackParse.
 
 	for pointer < lengths {
 		Stack.BlockPush(Blocks[pointer])
@@ -123,11 +124,11 @@ func (p *Parser) Parse(input *[]Block) ExprNode {
 	return Head
 }
 
-func (p *Parser) stackParse(input *BlockStack) ExprNode {
-	var object ExprNode
+func (p *Parser) stackParse(input *core.BlockStack) core.ExprNode {
+	var object core.ExprNode
 
 	switch input.Seek().Token {
-	case TokenString:
+	case core.TokenString:
 		if p.funcBuffer.Length() > 1 { //Check another block is existed in stack.
 			p.funcBuffer.BlockPush(input.BlockPop())
 			break
@@ -135,14 +136,14 @@ func (p *Parser) stackParse(input *BlockStack) ExprNode {
 		item := input.BlockPop().Item
 
 		stringTh := []string{item}
-		object = MakeExprNode(TypeString, stringTh)
+		object = core.MakeExprNode(core.TypeString, stringTh)
 
-	case TokenBlockStart:
+	case core.TokenBlockStart:
 		openToken := input.BlockPop()
 		p.bcounter.IncOpen()
 		p.funcBuffer.BlockPush(openToken)
 
-	case TokenBlockEnd:
+	case core.TokenBlockEnd:
 		closeToken := input.BlockPop()
 		p.bcounter.IncClose()
 		p.funcBuffer.BlockPush(closeToken)
@@ -165,8 +166,8 @@ func (p *Parser) stackParse(input *BlockStack) ExprNode {
 	return object
 }
 
-func (p *Parser) funcParse(input *BlockStack) (ExprNode, bool) {
-	var object ExprNode
+func (p *Parser) funcParse(input *core.BlockStack) (core.ExprNode, bool) {
+	var object core.ExprNode
 
 	frame := *(input)
 
@@ -176,7 +177,7 @@ func (p *Parser) funcParse(input *BlockStack) (ExprNode, bool) {
 	}
 
 	//Check function is closed.
-	if !(frame.Seek().Token == TokenBlockEnd) {
+	if !(frame.Seek().Token == core.TokenBlockEnd) {
 		return object, false
 	}
 
@@ -187,13 +188,13 @@ func (p *Parser) funcParse(input *BlockStack) (ExprNode, bool) {
 
 	//Check function is starting with function symbol, Check function Open Token is existed in right place.
 	//Clear buffer when Token block position is not correct.
-	if !(frame.BlockList[0].Token == TokenFunc && frame.BlockList[1].Token == TokenBlockStart) {
+	if !(frame.BlockList[0].Token == core.TokenFunc && frame.BlockList[1].Token == core.TokenBlockStart) {
 		input.Clear()
 		return object, false
 	}
 
 	//Is context string is Exist?
-	if frame.BlockList[2].Token == TokenString {
+	if frame.BlockList[2].Token == core.TokenString {
 		funcData := frame.BlockList[2]               //Get context.
 		splited := strings.Split(funcData.Item, " ") //Split string to parse function name & args
 
@@ -219,11 +220,11 @@ func (p *Parser) funcParse(input *BlockStack) (ExprNode, bool) {
 			}
 		}
 
-		object = MakeFunctionNode(funcName, fnargs, []string{pFuncContext})
+		object = core.MakeFunctionNode(funcName, fnargs, []string{pFuncContext})
 
 		//If inner-function is existed?
-		if frame.BlockList[3].Token == TokenFunc {
-			var innerFuncStack BlockStack
+		if frame.BlockList[3].Token == core.TokenFunc {
+			var innerFuncStack core.BlockStack
 			innerFuncStack.AppendStack(frame, 3, frame.Length()-1)
 
 			p.bcounter.DecCounter()
@@ -242,14 +243,14 @@ func (p *Parser) funcParse(input *BlockStack) (ExprNode, bool) {
 	return object, true
 }
 
-func (p *Parser) parseInnerBlock(input BlockStack) ([]ExprNode, bool) {
-	var position = make([]int, 0)       //Position of deffunc
-	var parseList []BlockStack          //Parsed Innerfuncs
-	var bkcounter = MakeBraketCounter() //Counter for parse innerfunc braket
-	var object []ExprNode
+func (p *Parser) parseInnerBlock(input core.BlockStack) ([]core.ExprNode, bool) {
+	var position = make([]int, 0)            //Position of deffunc
+	var parseList []core.BlockStack          //Parsed Innerfuncs
+	var bkcounter = core.MakeBraketCounter() //Counter for parse innerfunc braket
+	var object []core.ExprNode
 
 	for idx, item := range input.BlockList {
-		if item.Token == TokenFunc {
+		if item.Token == core.TokenFunc {
 			position = append(position, idx)
 		}
 	}
@@ -263,9 +264,9 @@ func (p *Parser) parseInnerBlock(input BlockStack) ([]ExprNode, bool) {
 	ipos := 0
 	for pointer < len(input.BlockList) {
 		switch input.BlockList[pointer].Token {
-		case TokenBlockStart:
+		case core.TokenBlockStart:
 			bkcounter.IncOpen()
-		case TokenBlockEnd:
+		case core.TokenBlockEnd:
 			bkcounter.IncClose()
 		}
 
@@ -273,7 +274,7 @@ func (p *Parser) parseInnerBlock(input BlockStack) ([]ExprNode, bool) {
 			end := pointer + 1
 			start := position[ipos]
 
-			innerFuncStk := NewBlockStack()
+			innerFuncStk := core.NewBlockStack()
 			innerFuncStk.AppendStack(input, start, end)
 
 			parseList = append(parseList, innerFuncStk)
