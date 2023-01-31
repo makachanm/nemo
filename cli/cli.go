@@ -2,7 +2,7 @@ package cli
 
 import (
 	"fmt"
-	"nemo/build"
+	build "nemo/core"
 	"nemo/utils"
 )
 

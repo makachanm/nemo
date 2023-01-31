@@ -1,4 +1,4 @@
-package core
+package nmcore
 
 type Token int
 type NodeType int

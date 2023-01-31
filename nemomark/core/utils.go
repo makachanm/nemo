@@ -1,4 +1,4 @@
-package core
+package nmcore
 
 func GetChar(s *string, idx int) string {
 	return string((*s)[idx])

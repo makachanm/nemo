@@ -3,7 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
-	"nemo/build"
+	build "nemo/core"
 	"nemo/utils"
 	"os"
 )

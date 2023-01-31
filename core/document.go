@@ -3,12 +3,12 @@ package build
 import (
 	"bytes"
 	"nemo/nemomark"
-	"nemo/nemomark/core"
+	nmcore "nemo/nemomark/core"
 	"strconv"
 	"text/template"
 )
 
-type MarkdownFucntion core.MarkdownFucntion
+type MarkdownFucntion nmcore.MarkdownFucntion
 
 type TimeStamp struct {
 	Year  int
@@ -139,7 +139,7 @@ func (d *Document) ParseMeta(input string) {
 	lexer := nemomark.NewLexer()
 	parser := nemomark.NewParser()
 
-	lexed := lexer.Tokenize(input, core.TokenMap)
+	lexed := lexer.Tokenize(input, nmcore.TokenMap)
 	parseResult := parser.Parse(&lexed)
 
 	for _, ctx := range parseResult.Child {
