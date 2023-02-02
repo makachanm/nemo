@@ -500,8 +500,6 @@ func (b *Builder) Build() {
 		b.TagList[tkey] = tagsort
 	}
 
-	//fmt.Println("TGL :", b.TagList)
-
 	sort.Slice(b.PostList, func(i, j int) bool {
 		tsp := TimeStamp{}
 		return tsp.isBiggerStamp(b.PostList[i].Timestamp, b.PostList[j].Timestamp)
