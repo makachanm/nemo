@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"path/filepath"
 	"reflect"
 )
 
@@ -46,12 +47,13 @@ func (s *Skin) GetSkin() error {
 		return perr
 	}
 
-	_, skinexist := os.Stat(skinpath + "/skin/skin.json")
+	//_, skinexist := os.Stat(skinpath + "/skin/skin.json")
+	_, skinexist := os.Stat(filepath.Join(skinpath, "skin", "skin.json"))
 	if os.IsNotExist(skinexist) {
 		return errors.New("skin is not exist")
 	}
 
-	ctx, ferr := os.ReadFile(skinpath + "/skin/skin.json")
+	ctx, ferr := os.ReadFile(filepath.Join(skinpath, "skin", "skin.json"))
 
 	if ferr != nil {
 		return ferr

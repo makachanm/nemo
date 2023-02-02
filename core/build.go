@@ -8,6 +8,7 @@ import (
 	"nemo/nemomark"
 	"nemo/utils"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -433,7 +434,7 @@ func (b *Builder) Build() {
 
 	wd, derr := os.Getwd()
 	b.wd = wd
-	workd := b.wd + "/post/"
+	workd := filepath.Join(b.wd, "post")
 
 	if derr != nil {
 		fmt.Println("Error getting working directory:", derr)
@@ -450,7 +451,7 @@ func (b *Builder) Build() {
 	for _, ctx := range dir {
 		name := ctx.Name()
 		if strings.ContainsAny(name, ".ps") && (name != "about.ps") && (!ctx.Type().IsDir()) {
-			BuildTargets = append(BuildTargets, workd+name)
+			BuildTargets = append(BuildTargets, filepath.Join(workd, name))
 		}
 	}
 

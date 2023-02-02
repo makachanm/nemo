@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type Manifest struct {
@@ -20,11 +21,11 @@ func GetManifest() (Manifest, error) {
 		return Manifest{}, err
 	}
 
-	if _, err := os.Stat(wd + "/manifest.json"); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath.Join(wd, "manifest.json")); os.IsNotExist(err) {
 		return Manifest{}, fmt.Errorf("manifest file does not exist")
 	}
 
-	ctx, err := os.ReadFile(wd + "/manifest.json")
+	ctx, err := os.ReadFile(filepath.Join(wd, "manifest.json"))
 	if err != nil {
 		return Manifest{}, err
 	}
