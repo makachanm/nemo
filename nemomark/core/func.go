@@ -69,5 +69,5 @@ func code(input MarkdownFucntion) string {
 	str := strings.Join(input.Context, "")
 	str = strings.ReplaceAll(str, "\n", "<br />")
 
-	return "<code>" + str + "</code>"
+	return `<div class="code"> <code>` + str + `</code> </div>`
 }
