@@ -8,7 +8,9 @@ import (
 )
 
 var (
-	BuildDate, Arch, Version string
+	Version   string
+	Arch      string
+	BuildDate string
 )
 
 func main() {

@@ -62,10 +62,10 @@ var TokenMap = map[string]Token{
 }
 
 var NTokenMap = map[string]TokMapElement{
-	"$": TokMapElement{Token: TokenFunc, MatchChar: "$"},
-	"[": TokMapElement{Token: TokenBlockStart, MatchChar: "["},
-	"]": TokMapElement{Token: TokenBlockEnd, MatchChar: "]"},
-	"`": TokMapElement{Token: TokenIgnore, MatchChar: "`"},
+	"$": {Token: TokenFunc, MatchChar: "$"},
+	"[": {Token: TokenBlockStart, MatchChar: "["},
+	"]": {Token: TokenBlockEnd, MatchChar: "]"},
+	"`": {Token: TokenIgnore, MatchChar: "`"},
 }
 
 func NewBlockStack() BlockStack {
@@ -199,5 +199,5 @@ func (b *BraketCounter) IsBlocked() bool {
 }
 
 func (b *BraketCounter) IsZero() bool {
-	return ((b.Open == 0) && (b.Close == 0))
+	return (b.Open == 0) && (b.Close == 0)
 }

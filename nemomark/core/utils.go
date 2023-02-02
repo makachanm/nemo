@@ -5,7 +5,7 @@ func GetChar(s *string, idx int) string {
 }
 
 func GetCharfromRange(s *string, start int, end int) string {
-	return string((*s)[start:end])
+	return (*s)[start:end]
 }
 
 func GenerateBlock(tokentype Token, content string) Block {
@@ -16,9 +16,9 @@ func GenerateBlock(tokentype Token, content string) Block {
 }
 
 func AppendSingleBlock(bs *[]Block, input Block) {
-	(*bs) = append((*bs), input)
+	*bs = append(*bs, input)
 }
 
 func RemoveElementBlockArray(bs *[]Block, idx int) {
-	(*bs) = (*bs)[(idx + 1):]
+	*bs = (*bs)[(idx + 1):]
 }

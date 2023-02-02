@@ -65,14 +65,14 @@ func (ci *Interface) Handle(args []string) {
 	handler()
 }
 
-func (i Interface) buildHandler() {
+func (ci *Interface) buildHandler() {
 	var b build.Builder
 
-	build.MakeNewBuilder(&b, i.versionInfo, i.configInfo)
+	build.MakeNewBuilder(&b, ci.versionInfo, ci.configInfo)
 
 	b.Build()
 }
 
-func (i Interface) printHelpMessage() {
+func (ci *Interface) printHelpMessage() {
 	fmt.Print(UsageT)
 }

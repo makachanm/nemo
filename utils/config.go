@@ -22,7 +22,7 @@ func LoadConfig() (Config, error) {
 	if _, err := os.Stat(filepath.Join(wd, "config.json")); os.IsNotExist(err) {
 		fmt.Println("configuration file does not exist. Creating new configuration file.")
 		MakeConfig()
-		return Config{}, errors.New("Config File not exist")
+		return Config{}, errors.New("config file not exist")
 
 	}
 

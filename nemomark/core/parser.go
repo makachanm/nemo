@@ -5,106 +5,106 @@ import (
 )
 
 type NLexer struct {
-	internal_counter BraketCounter
+	internalCounter BraketCounter
 }
 
 type NParser struct {
-	internal_counter BraketCounter
-	func_stack       BlockStack
+	internalCounter BraketCounter
+	funcStack       BlockStack
 }
 
 func NewNLexer() NLexer {
 	return NLexer{
-		internal_counter: MakeBraketCounter(),
+		internalCounter: MakeBraketCounter(),
 	}
 }
 
 func NewNParser() NParser {
 	return NParser{
-		internal_counter: MakeBraketCounter(),
-		func_stack:       NewBlockStack(),
+		internalCounter: MakeBraketCounter(),
+		funcStack:       NewBlockStack(),
 	}
 }
 
 func (l *NLexer) Toknize(input string, tokenmap map[string]TokMapElement) []Block {
-	var total_lengths uint64 = uint64(len(input))
+	var totalLengths = uint64(len(input))
 	var pointer uint64 = 0
 
-	var processed_blocks []Block
+	var processedBlocks []Block
 
-	for pointer < total_lengths {
-		current_char := GetChar(&input, int(pointer))
-		token_val, is_token := tokenmap[current_char]
+	for pointer < totalLengths {
+		currentChar := GetChar(&input, int(pointer))
+		tokenVal, isToken := tokenmap[currentChar]
 
-		if is_token && token_val.Token != TokenIgnore {
-			AppendSingleBlock(&processed_blocks, GenerateBlock(token_val.Token, token_val.MatchChar))
+		if isToken && tokenVal.Token != TokenIgnore {
+			AppendSingleBlock(&processedBlocks, GenerateBlock(tokenVal.Token, tokenVal.MatchChar))
 			pointer++
-		} else if token_val.Token == TokenIgnore {
-			var start_pos, end_pos uint64
-			start_pos = pointer + 1
-			current_pos := start_pos
-			is_break := false
+		} else if tokenVal.Token == TokenIgnore {
+			var startPos, endPos uint64
+			startPos = pointer + 1
+			currentPos := startPos
+			isBreak := false
 
-			for current_pos < total_lengths && !is_break {
-				if tokenmap[GetChar(&input, int(current_pos))].Token == TokenIgnore {
-					is_break = true
+			for currentPos < totalLengths && !isBreak {
+				if tokenmap[GetChar(&input, int(currentPos))].Token == TokenIgnore {
+					isBreak = true
 				}
 
-				current_pos++
+				currentPos++
 			}
-			end_pos = current_pos
+			endPos = currentPos
 
-			AppendSingleBlock(&processed_blocks, GenerateBlock(TokenString, GetCharfromRange(&input, int(start_pos), int(end_pos-1))))
-			pointer = uint64(end_pos)
+			AppendSingleBlock(&processedBlocks, GenerateBlock(TokenString, GetCharfromRange(&input, int(startPos), int(endPos-1))))
+			pointer = endPos
 
 		} else {
-			var start_pos, end_pos uint64
-			current_pos := pointer
-			is_break := false
+			var startPos, endPos uint64
+			currentPos := pointer
+			isBreak := false
 
-			start_pos = pointer
-			for current_pos < total_lengths && !is_break {
-				_, is_break = tokenmap[GetChar(&input, int(current_pos))]
-				current_pos++
+			startPos = pointer
+			for currentPos < totalLengths && !isBreak {
+				_, isBreak = tokenmap[GetChar(&input, int(currentPos))]
+				currentPos++
 			}
-			end_pos = current_pos - 1
+			endPos = currentPos - 1
 
-			if total_lengths == (pointer + 1) { //if is last char of input?
-				end_pos++
+			if totalLengths == (pointer + 1) { //if is last char of input?
+				endPos++
 			}
 
-			AppendSingleBlock(&processed_blocks, GenerateBlock(TokenString, GetCharfromRange(&input, int(start_pos), int(end_pos))))
-			pointer = uint64(end_pos)
+			AppendSingleBlock(&processedBlocks, GenerateBlock(TokenString, GetCharfromRange(&input, int(startPos), int(endPos))))
+			pointer = endPos
 
 		}
 	}
 
-	AppendSingleBlock(&processed_blocks, GenerateBlock(TokenEol, ""))
-	return processed_blocks
+	AppendSingleBlock(&processedBlocks, GenerateBlock(TokenEol, ""))
+	return processedBlocks
 }
 
 func (p *NParser) Parse(input []Block) ExprNode {
-	var origin_node ExprNode = MakeExprNode(TypeSection, nil)
+	var originNode = MakeExprNode(TypeSection, nil)
 	var pointer uint64 = 0
 
 	for input[pointer].Token != TokenEol {
-		p.func_stack.BlockPush(input[pointer])
+		p.funcStack.BlockPush(input[pointer])
 
-		switch p.func_stack.Seek().Token {
+		switch p.funcStack.Seek().Token {
 		case TokenString:
-			if p.func_stack.Length() <= 1 {
-				string_block := p.func_stack.BlockPop()
-				origin_node.SingleInsert(MakeExprNode(TypeString, []string{string_block.Item}))
+			if p.funcStack.Length() <= 1 {
+				stringBlock := p.funcStack.BlockPop()
+				originNode.SingleInsert(MakeExprNode(TypeString, []string{stringBlock.Item}))
 			}
 
 		case TokenBlockStart:
-			p.internal_counter.IncOpen()
+			p.internalCounter.IncOpen()
 
 		case TokenBlockEnd:
-			p.internal_counter.IncClose()
-			if p.internal_counter.IsBlocked() {
-				rsnode := parseFuncStack(&p.func_stack)
-				origin_node.SingleInsert(rsnode)
+			p.internalCounter.IncClose()
+			if p.internalCounter.IsBlocked() {
+				rsnode := parseFuncStack(&p.funcStack)
+				originNode.SingleInsert(rsnode)
 			}
 		}
 
@@ -112,105 +112,105 @@ func (p *NParser) Parse(input []Block) ExprNode {
 
 	}
 
-	return origin_node
+	return originNode
 }
 
 func parseFuncStack(input *BlockStack) ExprNode {
-	var func_node ExprNode
+	var funcNode ExprNode
 
 	if !(input.Length() > 1) && input.Seek().Token == TokenString { //check it is singe string token
-		func_node = MakeExprNode(TypeString, []string{input.BlockPop().Item})
-		return func_node
+		funcNode = MakeExprNode(TypeString, []string{input.BlockPop().Item})
+		return funcNode
 	}
 
-	stack_ctx := input.Clear()
-	stack_ctx = stack_ctx[2:(len(stack_ctx) - 1)] //remove unused symbols
+	stackCtx := input.Clear()
+	stackCtx = stackCtx[2:(len(stackCtx) - 1)] //remove unused symbols
 
-	func_node = parseFunc(stack_ctx[0].Item)
-	RemoveElementBlockArray(&stack_ctx, 0)
+	funcNode = parseFunc(stackCtx[0].Item)
+	RemoveElementBlockArray(&stackCtx, 0)
 
-	var inner_fn_stacks []BlockStack
-	var sym_counter BraketCounter = MakeBraketCounter()
-	var innerfns_pointer uint64 = 0
+	var innerFnStacks []BlockStack
+	var symCounter = MakeBraketCounter()
+	var innerfnsPointer uint64 = 0
 	var fstart, fend uint64 = 0, 0
 
 	//parse inner blocks to pieces
-	for len(stack_ctx) > 0 {
-		switch stack_ctx[innerfns_pointer].Token {
+	for len(stackCtx) > 0 {
+		switch stackCtx[innerfnsPointer].Token {
 		case TokenFunc:
-			if !sym_counter.IsBlocked() {
-				innerfns_pointer++
+			if !symCounter.IsBlocked() {
+				innerfnsPointer++
 			} else {
-				fstart = innerfns_pointer
-				innerfns_pointer++
+				fstart = innerfnsPointer
+				innerfnsPointer++
 			}
 
 		case TokenBlockStart:
-			sym_counter.IncOpen()
-			innerfns_pointer++
+			symCounter.IncOpen()
+			innerfnsPointer++
 
 		case TokenBlockEnd:
-			sym_counter.IncClose()
-			if sym_counter.IsBlocked() {
-				fend = innerfns_pointer
+			symCounter.IncClose()
+			if symCounter.IsBlocked() {
+				fend = innerfnsPointer
 
 				nstack := NewBlockStack()
-				nstack.AppendArray(&stack_ctx, int(fstart), int(fend))
-				inner_fn_stacks = append(inner_fn_stacks, nstack)
-				sym_counter.Clear()
-				innerfns_pointer = 0
-			} else if len(stack_ctx) <= 1 {
-				RemoveElementBlockArray(&stack_ctx, 0)
+				nstack.AppendArray(&stackCtx, int(fstart), int(fend))
+				innerFnStacks = append(innerFnStacks, nstack)
+				symCounter.Clear()
+				innerfnsPointer = 0
+			} else if len(stackCtx) <= 1 {
+				RemoveElementBlockArray(&stackCtx, 0)
 			} else {
-				innerfns_pointer++
+				innerfnsPointer++
 			}
 
 		default:
-			if sym_counter.IsBlocked() || sym_counter.IsZero() {
-				fend = innerfns_pointer
+			if symCounter.IsBlocked() || symCounter.IsZero() {
+				fend = innerfnsPointer
 
 				nstack := NewBlockStack()
-				nstack.AppendArray(&stack_ctx, int(fstart), int(fend))
-				inner_fn_stacks = append(inner_fn_stacks, nstack)
-				sym_counter.Clear()
-				innerfns_pointer = 0
+				nstack.AppendArray(&stackCtx, int(fstart), int(fend))
+				innerFnStacks = append(innerFnStacks, nstack)
+				symCounter.Clear()
+				innerfnsPointer = 0
 
 			} else {
-				innerfns_pointer++
+				innerfnsPointer++
 			}
 
 		}
 	}
 
-	if len(inner_fn_stacks) > 0 {
-		for _, ptaget_stack := range inner_fn_stacks {
-			inp_node := parseFuncStack(&ptaget_stack)
-			func_node.SingleInsert(inp_node)
+	if len(innerFnStacks) > 0 {
+		for _, ptagetStack := range innerFnStacks {
+			inpNode := parseFuncStack(&ptagetStack)
+			funcNode.SingleInsert(inpNode)
 		}
 	}
 
-	return func_node
+	return funcNode
 }
 
 func parseFunc(input string) ExprNode {
-	splited_d := strings.Split(input, " ")
-	fn_name := splited_d[0]
-	fn_ctx := []string{strings.Join(splited_d[1:], " ")}
-	fn_args := make(map[string]string)
+	splitedD := strings.Split(input, " ")
+	fnName := splitedD[0]
+	fnCtx := []string{strings.Join(splitedD[1:], " ")}
+	fnArgs := make(map[string]string)
 
-	if strings.Contains(fn_name, "(") && strings.Contains(fn_name, ")") {
-		split_point := (strings.Index(fn_name, "(") + 1)
-		argsctx := fn_name[split_point:(len(fn_name) - 1)]
-		qname := fn_name[:(split_point - 1)]
+	if strings.Contains(fnName, "(") && strings.Contains(fnName, ")") {
+		splitPoint := strings.Index(fnName, "(") + 1
+		argsctx := fnName[splitPoint:(len(fnName) - 1)]
+		qname := fnName[:(splitPoint - 1)]
 
 		ls := strings.Split(argsctx, ",")
 		for _, ctxL := range ls {
-			spt_arg := strings.Split(ctxL, "=")
-			fn_args[spt_arg[0]] = strings.Join(spt_arg[1:], "=")
+			sptArg := strings.Split(ctxL, "=")
+			fnArgs[sptArg[0]] = strings.Join(sptArg[1:], "=")
 		}
 
-		return MakeFunctionNode(qname, fn_args, fn_ctx)
+		return MakeFunctionNode(qname, fnArgs, fnCtx)
 	}
 
-	return MakeFunctionNode(fn_name, fn_args, fn_ctx)
+	return MakeFunctionNode(fnName, fnArgs, fnCtx)
 }
