@@ -13,7 +13,7 @@ New workspace is created.
 Before you start, You must install skin to /skin directory.
 Read guide about setting up skin for your workspace.`
 
-func createNewSpace(vinfo utils.VersionInfo) {
+func createNewSpace() {
 	wd, _ := os.Getwd()
 	_, maniexist := os.Stat("manifest.json")
 
@@ -106,6 +106,8 @@ func createNewSpace(vinfo utils.VersionInfo) {
 		fmt.Println("Error creating res directory:", err)
 		return
 	}
+
+	utils.MakeConfig()
 
 	fmt.Println("Build Complete")
 	fmt.Println(StartMessage)

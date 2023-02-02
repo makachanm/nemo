@@ -27,9 +27,10 @@ type Builder struct {
 	IndexPageNum int
 	wd           string
 	vinfo        utils.VersionInfo
+	config       utils.Config
 }
 
-func MakeNewBuilder(b *Builder, vinfo utils.VersionInfo) {
+func MakeNewBuilder(b *Builder, vinfo utils.VersionInfo, config utils.Config) {
 	mfest, err := GetManifest()
 	if err != nil {
 		return
@@ -39,7 +40,8 @@ func MakeNewBuilder(b *Builder, vinfo utils.VersionInfo) {
 	b.Manifest = mfest
 	b.TagList = make(map[string][]DocumentMeta)
 	b.vinfo = vinfo
-	b.MarkBuilder = *nemomark.NewNemomark(false)
+	b.config = config
+	b.MarkBuilder = *nemomark.NewNemomark(config.UseLegacyParser)
 }
 
 func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {

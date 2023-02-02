@@ -6,6 +6,15 @@ import (
 	"nemo/utils"
 )
 
+const UsageT = `Usage: nemo <command>
+
+Commands:
+  build       Build the site
+  newpost     Create a new post
+  create      Create a new space
+  help        Print this help message
+`
+
 const (
 	BuildCommand    = "build"
 	NewPostCommand  = "newpost"
@@ -15,29 +24,24 @@ const (
 
 type Interface struct {
 	Usage       string
-	commandMap  map[string]func(utils.VersionInfo)
+	commandMap  map[string]func()
 	versionInfo utils.VersionInfo
+	configInfo  utils.Config
 }
 
-func MakeCli(vinfo utils.VersionInfo) Interface {
+func MakeCli(vinfo utils.VersionInfo, config utils.Config) Interface {
 	ci := Interface{
-		Usage: `Usage: nemo <command>
-
-Commands:
-  build       Build the site
-  newpost     Create a new post
-  create      Create a new space
-  help        Print this help message
-`,
-
-		commandMap: map[string]func(utils.VersionInfo){
-			BuildCommand:    buildHandler,
-			NewPostCommand:  GeneratePost,
-			CreateCommand:   createNewSpace,
-			ShowHelpMessage: printHelpMessage,
-		},
+		Usage: UsageT,
 
 		versionInfo: vinfo,
+		configInfo:  config,
+	}
+
+	ci.commandMap = map[string]func(){
+		BuildCommand:    ci.buildHandler,
+		NewPostCommand:  GeneratePost,
+		CreateCommand:   createNewSpace,
+		ShowHelpMessage: ci.printHelpMessage,
 	}
 
 	return ci
@@ -58,17 +62,17 @@ func (ci *Interface) Handle(args []string) {
 		return
 	}
 
-	handler(ci.versionInfo)
+	handler()
 }
 
-func buildHandler(vinfo utils.VersionInfo) {
+func (i Interface) buildHandler() {
 	var b build.Builder
 
-	build.MakeNewBuilder(&b, vinfo)
+	build.MakeNewBuilder(&b, i.versionInfo, i.configInfo)
 
 	b.Build()
 }
 
-func printHelpMessage(vinfo utils.VersionInfo) {
-	fmt.Println(MakeCli(vinfo).Usage)
+func (i Interface) printHelpMessage() {
+	fmt.Print(UsageT)
 }
