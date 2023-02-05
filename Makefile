@@ -1,4 +1,4 @@
-VERSION = 0.10.0
+VERSION = 0.11.0
 
 CC = go
 DATE = $(shell date +%Y%m%d%H%M)
