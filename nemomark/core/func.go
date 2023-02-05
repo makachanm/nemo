@@ -12,6 +12,8 @@ var MarkdownHandlers = map[string]func(MarkdownFucntion) string{
 	"link":      link,
 	"image":     image,
 	"code":      code,
+	"head":      head,
+	"small":     small,
 }
 
 func RenderPlain(input []string) string {
@@ -70,4 +72,14 @@ func code(input MarkdownFucntion) string {
 	str = strings.ReplaceAll(str, "\n", "<br />")
 
 	return `<div class="code"> <code>` + str + `</code> </div>`
+}
+
+func head(input MarkdownFucntion) string {
+	str := strings.Join(input.Context, "")
+	return "<h2>" + str + "</h2><hr />"
+}
+
+func small(input MarkdownFucntion) string {
+	str := strings.Join(input.Context, "")
+	return "<h6>" + str + "</h6>"
 }
