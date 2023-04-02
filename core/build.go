@@ -2,7 +2,6 @@ package build
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
 	"log"
 	"nemo/nemomark"
@@ -411,16 +410,7 @@ func (b *Builder) packRes() {
 
 func makeFileName(title string, smp TimeStamp) string {
 	timesp := smp.StampSize()
-
-	var fileTitle string
-
-	if len(title) > 10 {
-		fileTitle = title[:10]
-	} else {
-		fileTitle = title
-	}
-
-	fileTitle = base64.StdEncoding.EncodeToString([]byte(fileTitle))
+	fileTitle := utils.MakeUniqueFileName(title)
 
 	fname := strconv.Itoa(timesp) + "-" + fileTitle + ".html"
 	return fname
@@ -461,6 +451,7 @@ func (b *Builder) Build() {
 
 	_, exerr := os.Stat("dist")
 	if os.IsNotExist(exerr) {
+		fmt.Println("Dist directory is not exist.")
 		_ = os.Mkdir("dist", os.ModePerm)
 		_ = os.Chdir("dist")
 		_ = os.Mkdir("page", os.ModePerm)
