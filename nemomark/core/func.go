@@ -11,6 +11,7 @@ var MarkdownHandlers = map[string]func(MarkdownFucntion) string{
 	"underline": underline,
 	"link":      link,
 	"image":     image,
+	"video":     video,
 	"code":      code,
 	"head":      head,
 	"small":     small,
@@ -65,6 +66,18 @@ func image(input MarkdownFucntion) string {
 	imgtag := `<img src="` + src + `" class="content-image" alt="` + altstr + `">`
 
 	return `<a href="` + src + `">` + imgtag + `</a>`
+}
+
+func video(input MarkdownFucntion) string {
+	src, isexist := input.Args["url"]
+
+	if !isexist {
+		return ""
+	}
+
+	vidtag := `<video src="` + src + `" class="content-video" controls></video>`
+
+	return `<a href="` + src + `">` + vidtag + `</a>`
 }
 
 func code(input MarkdownFucntion) string {
