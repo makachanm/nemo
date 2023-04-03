@@ -75,9 +75,7 @@ func video(input MarkdownFucntion) string {
 		return ""
 	}
 
-	vidtag := `<video src="` + src + `" class="content-video" controls></video>`
-
-	return `<a href="` + src + `">` + vidtag + `</a>`
+	return `<video src="` + src + `"class="content-video" controls></video>`
 }
 
 func code(input MarkdownFucntion) string {
