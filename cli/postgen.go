@@ -34,16 +34,16 @@ $[tag Tags]
 
 	postFile, err := os.Create(postFilePath)
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 	defer func(postFile *os.File) {
 		err := postFile.Close()
 		if err != nil {
-			log.Println(err)
+			log.Fatal(err)
 		}
 	}(postFile)
 
 	if _, err := io.Copy(postFile, bytes.NewBuffer([]byte(postctx))); err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 }

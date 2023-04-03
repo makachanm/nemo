@@ -32,7 +32,7 @@ type Builder struct {
 func MakeNewBuilder(b *Builder, vinfo utils.VersionInfo, config utils.Config) {
 	mfest, err := GetManifest()
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 
 	b.Skin = MakeSkin()
@@ -49,7 +49,7 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	ctx, perr := os.ReadFile(postpath)
 
 	if perr != nil {
-		fmt.Println("Error reading file:", perr)
+		log.Fatal("Error reading file: ", perr)
 	}
 
 	postRawctx := string(ctx)
@@ -70,28 +70,28 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 	headd := Header{IsNotIndex: true, BlogName: bname, PostName: document.Meta.Title}
 	head, err := BuildHeader(b.Skin, headd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	document.Head = head
 
 	footd := Footer{IsNotIndex: true}
 	foot, err := BuildFooter(b.Skin, footd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	document.Foot = foot
 
 	navd := Nav{IsNotIndex: true, BlogName: bname}
 	nav, err := BuildNav(b.Skin, navd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	document.Nav = nav
 
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.Post)
 
 	if fserr != nil {
-		fmt.Println("Error reading file:", fserr)
+		log.Fatal("Error reading file: ", fserr)
 	}
 
 	var builder template.Template
@@ -177,28 +177,28 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 	head, err := BuildHeader(b.Skin, headd)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	indexs.Head = head
 
 	footd := Footer{IsNotIndex: false}
 	foot, err := BuildFooter(b.Skin, footd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	indexs.Foot = foot
 
 	navd := Nav{IsNotIndex: false, BlogName: bname}
 	nav, err := BuildNav(b.Skin, navd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	indexs.Nav = nav
 
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.Index)
 
 	if fserr != nil {
-		fmt.Println("Error reading file:", fserr)
+		log.Fatal("Error reading file: ", fserr)
 	}
 
 	var builder template.Template
@@ -215,7 +215,7 @@ func (b *Builder) buildIndex(indexnum int, isFirstIndexBuild bool) {
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
-		fmt.Println("Error parsing file:", err)
+		log.Fatal("Error parsing file: ", err)
 	}
 
 	var writer bytes.Buffer
@@ -240,27 +240,27 @@ func (b *Builder) buildTagsPage() {
 	headd := Header{IsNotIndex: false, BlogName: bname}
 	head, err := BuildHeader(b.Skin, headd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	tags.Head = head
 
 	footd := Footer{IsNotIndex: false}
 	foot, err := BuildFooter(b.Skin, footd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	tags.Foot = foot
 
 	navd := Nav{IsNotIndex: false, BlogName: bname}
 	nav, err := BuildNav(b.Skin, navd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	tags.Nav = nav
 
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.Tags)
 	if fserr != nil {
-		fmt.Println("Error reading file:", fserr)
+		log.Fatal("Error reading file: ", fserr)
 	}
 
 	var builder template.Template
@@ -277,7 +277,7 @@ func (b *Builder) buildTagsPage() {
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
-		fmt.Println("Error parsing file:", err)
+		log.Fatal("Error parsing file: ", err)
 	}
 
 	var writer bytes.Buffer
@@ -298,7 +298,7 @@ func (b *Builder) buildAboutPage() {
 	ctx, perr := os.ReadFile(b.wd + "/post/about.ps")
 
 	if perr != nil {
-		fmt.Println("Error reading file:", perr)
+		log.Fatal("Error reading file: ", perr)
 	}
 
 	postRawctx := string(ctx)
@@ -312,21 +312,21 @@ func (b *Builder) buildAboutPage() {
 	headd := Header{IsNotIndex: false, BlogName: bname}
 	head, err := BuildHeader(b.Skin, headd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	document.Head = head
 
 	footd := Footer{IsNotIndex: false}
 	foot, err := BuildFooter(b.Skin, footd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	document.Foot = foot
 
 	navd := Nav{IsNotIndex: false, BlogName: bname}
 	nav, err := BuildNav(b.Skin, navd)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	document.Nav = nav
 
@@ -337,7 +337,7 @@ func (b *Builder) buildAboutPage() {
 	file, fserr := os.ReadFile(b.Skin.Info.Paths.About)
 
 	if fserr != nil {
-		fmt.Println("Error reading file:", fserr)
+		log.Fatal("Error reading file: ", fserr)
 	}
 
 	var builder template.Template
@@ -357,7 +357,7 @@ func (b *Builder) buildAboutPage() {
 	t, err := builder.Parse(string(file))
 
 	if err != nil {
-		fmt.Println("Error parsing file:", err)
+		log.Fatal("Error parsing file: ", err)
 	}
 
 	var writer bytes.Buffer
@@ -395,7 +395,7 @@ func (b *Builder) packRes() {
 
 	cerr := DirCopy(skinsrc, skindet)
 	if cerr != nil {
-		fmt.Println("Error copying directory:", cerr)
+		log.Fatal("Error copying directory: ", cerr)
 	}
 
 	resrc := "./post/res"
@@ -403,7 +403,7 @@ func (b *Builder) packRes() {
 
 	rerr := DirCopy(resrc, resdet)
 	if rerr != nil {
-		fmt.Println("Error copying directory:", rerr)
+		log.Fatal("Error copying directory: ", rerr)
 	}
 
 }
@@ -421,7 +421,7 @@ func (b *Builder) Build() {
 
 	err := b.Skin.GetSkin()
 	if err != nil {
-		fmt.Println("Error getting skin:", err)
+		log.Fatal("Error getting skin: ", err)
 	}
 
 	wd, derr := os.Getwd()
@@ -429,13 +429,13 @@ func (b *Builder) Build() {
 	workd := filepath.Join(b.wd, "post")
 
 	if derr != nil {
-		fmt.Println("Error getting working directory:", derr)
+		log.Fatal("Error getting working directory: ", derr)
 	}
 
 	dir, rderr := os.ReadDir(workd)
 
 	if rderr != nil {
-		fmt.Println("Error reading directory:", rderr)
+		log.Fatal("Error reading directory: ", rderr)
 	}
 
 	var BuildTargets = make([]string, 0)

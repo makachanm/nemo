@@ -3,6 +3,7 @@ package build
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 )
@@ -32,7 +33,7 @@ func DirCopy(src string, dst string) error {
 	defer func(directory *os.File) {
 		err := directory.Close()
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 		}
 	}(directory)
 
@@ -80,7 +81,7 @@ func FileCopy(src string, dst string) error {
 	defer func(source *os.File) {
 		err := source.Close()
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 		}
 	}(source)
 
@@ -91,7 +92,7 @@ func FileCopy(src string, dst string) error {
 	defer func(destination *os.File) {
 		err := destination.Close()
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 		}
 	}(destination)
 

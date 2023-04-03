@@ -3,6 +3,7 @@ package cli
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	build "nemo/core"
 	"nemo/utils"
 	"os"
@@ -25,35 +26,35 @@ func createNewSpace() {
 	fmt.Println("? Name:")
 	bname, err := Prompt(true)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		return
 	}
 
 	fmt.Println("? Author:")
 	bauthor, err := Prompt(false)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		return
 	}
 
 	fmt.Println("? Language:")
 	blang, err := Prompt(false)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		return
 	}
 
 	fmt.Println("? Repository (optional, need for publish):")
 	brepo, err := Prompt(false)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		return
 	}
 
 	fmt.Println("? Domain (optional, need for generate RSS Feed):")
 	bdom, err := Prompt(false)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 		return
 	}
 

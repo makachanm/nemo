@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"nemo/cli"
 	"nemo/utils"
 	"os"
@@ -17,8 +17,7 @@ func main() {
 	vinfo := utils.MakeVersionInfo(BuildDate, Arch, Version)
 	config, err := utils.LoadConfig()
 	if err != nil {
-		fmt.Println("Error in loading configuration: ", err)
-		os.Exit(-1)
+		log.Fatal("Error in loading configuration: ", err)
 	}
 
 	app := cli.MakeCli(vinfo, config)
