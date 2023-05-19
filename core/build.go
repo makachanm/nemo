@@ -393,7 +393,7 @@ func (b *Builder) packRes() {
 	skinsrc := "./skin/static/"
 	skindet := "./dist/static/"
 
-	cerr := DirCopy(skinsrc, skindet)
+	cerr := utils.DirCopy(skinsrc, skindet)
 	if cerr != nil {
 		log.Fatal("Error copying directory: ", cerr)
 	}
@@ -401,7 +401,7 @@ func (b *Builder) packRes() {
 	resrc := "./post/res"
 	resdet := "./dist/page/res"
 
-	rerr := DirCopy(resrc, resdet)
+	rerr := utils.DirCopy(resrc, resdet)
 	if rerr != nil {
 		log.Fatal("Error copying directory: ", rerr)
 	}
@@ -465,7 +465,7 @@ func (b *Builder) Build() {
 		}
 
 		name := makeFileName(dmeta.Title, dmeta.Timestamp)
-		fdir := b.wd + "/dist/page/" + name
+		fdir := b.wd + "/dist/" + name
 
 		fmt.Println(" => ", name)
 
