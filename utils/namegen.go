@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/base64"
+	"strconv"
 	"strings"
 )
 
@@ -9,20 +10,25 @@ var FilterStr []string = []string{
 	"/", `\`, ">", "<", ".", ":", `"`, "|", "?", "*",
 }
 
-func MakeUniqueFileName(title string) string {
+func MakeUniqueFileName(title string, stampdata int) string {
 	var fileTitle string
 
-	fname_k := base64.RawStdEncoding.EncodeToString([]byte(title))
+	b64name := base64.RawStdEncoding.EncodeToString([]byte(title))
+	stampsd := strconv.Itoa(stampdata)
 
 	for _, ct := range FilterStr {
-		fname_k = strings.ReplaceAll(fname_k, ct, "_")
+		b64name = strings.ReplaceAll(b64name, ct, "_")
 	}
 
-	if len(fname_k) > 16 {
-		fileTitle = fname_k[:16]
-	} else {
-		fileTitle = fname_k
+	if len(b64name) > 6 {
+		b64name = b64name[:6]
 	}
+
+	if len(stampsd) > 4 {
+		stampsd = stampsd[:4]
+	}
+
+	fileTitle = stampsd + b64name
 
 	return fileTitle
 }

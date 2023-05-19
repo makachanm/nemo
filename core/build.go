@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"text/template"
 )
@@ -67,21 +66,21 @@ func (b *Builder) buildPage(postpath string) (string, DocumentMeta, bool) {
 
 	bname := b.Manifest.Name
 
-	headd := Header{IsNotIndex: true, BlogName: bname, PostName: document.Meta.Title}
+	headd := Header{IsNotIndex: false, BlogName: bname, PostName: document.Meta.Title}
 	head, err := BuildHeader(b.Skin, headd)
 	if err != nil {
 		log.Fatal(err)
 	}
 	document.Head = head
 
-	footd := Footer{IsNotIndex: true}
+	footd := Footer{IsNotIndex: false}
 	foot, err := BuildFooter(b.Skin, footd)
 	if err != nil {
 		log.Fatal(err)
 	}
 	document.Foot = foot
 
-	navd := Nav{IsNotIndex: true, BlogName: bname}
+	navd := Nav{IsNotIndex: false, BlogName: bname}
 	nav, err := BuildNav(b.Skin, navd)
 	if err != nil {
 		log.Fatal(err)
@@ -399,7 +398,7 @@ func (b *Builder) packRes() {
 	}
 
 	resrc := "./post/res"
-	resdet := "./dist/page/res"
+	resdet := "./dist/res"
 
 	rerr := utils.DirCopy(resrc, resdet)
 	if rerr != nil {
@@ -410,9 +409,9 @@ func (b *Builder) packRes() {
 
 func makeFileName(title string, smp TimeStamp) string {
 	timesp := smp.StampSize()
-	fileTitle := utils.MakeUniqueFileName(title)
+	fileTitle := utils.MakeUniqueFileName(title, timesp)
 
-	fname := strconv.Itoa(timesp) + "-" + fileTitle + ".html"
+	fname := fileTitle + ".html"
 	return fname
 }
 
@@ -453,9 +452,6 @@ func (b *Builder) Build() {
 	if os.IsNotExist(exerr) {
 		fmt.Println("Dist directory is not exist.")
 		_ = os.Mkdir("dist", os.ModePerm)
-		_ = os.Chdir("dist")
-		_ = os.Mkdir("page", os.ModePerm)
-		_ = os.Chdir("..")
 	}
 
 	for _, ctx := range BuildTargets {
