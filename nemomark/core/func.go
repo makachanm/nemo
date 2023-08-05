@@ -82,7 +82,7 @@ func code(input MarkdownFucntion) string {
 	str := strings.Join(input.Context, "")
 	str = strings.ReplaceAll(str, "\n", "<br />")
 
-	return `<div class="code"> <code>` + str + `</code> </div>`
+	return `<div class="code">` + str + `</div>`
 }
 
 func head(input MarkdownFucntion) string {
